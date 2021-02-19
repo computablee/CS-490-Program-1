@@ -10,10 +10,20 @@ public class ProcessQueue {
     }
 
     public void pushProcess(Process p) {
-        processes.add(p);
+        synchronized(this) {
+            processes.add(p);
+        }
     }
 
     public Process popProcess() {
-        return processes.remove();
+        synchronized(this) {
+            return processes.remove();
+        }
+    }
+
+    public boolean hasProcesses() {
+        synchronized(this) {
+            return processes.size() > 0;
+        }
     }
 }
