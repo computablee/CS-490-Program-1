@@ -1,12 +1,13 @@
-import java.util.Comparator;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 public class ProcessQueue {
     private Queue<Process> processes;
 
-    public ProcessQueue() {
-        this.processes = new PriorityQueue<>(8, Comparator.comparingInt(Process::getPriority));
+    public ProcessQueue(QueueOrdering q) {
+        if (q == QueueOrdering.Priority)
+            this.processes = new PriorityQueue<>(8, Comparator.comparingInt(Process::getPriority));
+        else if (q == QueueOrdering.FIFO)
+            this.processes = new LinkedList<>();
     }
 
     public void pushProcess(Process p) {

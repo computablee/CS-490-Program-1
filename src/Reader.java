@@ -11,7 +11,7 @@ public class Reader {
     }
 
     public ProcessQueue getData() throws FileNotFoundException {
-        ProcessQueue processQueue = new ProcessQueue();
+        ProcessQueue processQueue = new ProcessQueue(QueueOrdering.FIFO);
         Scanner s = new Scanner(new File(this.fileName));
         s.useDelimiter(",|\\r\\n|\\n|\\r");
 
