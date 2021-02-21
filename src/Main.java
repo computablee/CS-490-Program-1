@@ -16,9 +16,7 @@ public class Main {
             return;
         }
 
-        while (pq.hasProcesses()) {
-            Process p = pq.popProcess();
-            System.out.println(p.getProcessID());
-        }
+        Processor processor = new Processor(1, 100, pq);
+        processor.startProcessor();
     }
 }
