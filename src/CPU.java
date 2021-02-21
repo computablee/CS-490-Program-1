@@ -4,6 +4,7 @@ public class CPU implements Runnable {
     private Thread t;
     private Process currProcess;
     private int millisecsPerTime;
+    private boolean isRunning;
 
     public CPU(int num, int millisecsPerTime) {
         this.queue = null;
@@ -18,15 +19,21 @@ public class CPU implements Runnable {
     }
 
     public void run() {
+        this.isRunning = true;
         while (queue.hasProcesses()) {
             currProcess = queue.popProcess();
 
             try {
+                System.out.println("CPU" + CPUnum.toString() + " now executing \"" + currProcess.getProcessID() + "\" for " + millisecsPerTime * currProcess.getServiceTime() + " milliseconds.");
+
                 Thread.sleep((long)millisecsPerTime * currProcess.getServiceTime());
             } catch (InterruptedException e) {
                 return;
             }
         }
+        currProcess = null;
+        this.isRunning = false;
+        System.out.println("CPU" + CPUnum.toString() + " retired.");
     }
 
     public void start() {
@@ -38,5 +45,16 @@ public class CPU implements Runnable {
 
     public int getCPUnum() {
         return CPUnum;
+    }
+
+    public String getExecutingProcess() {
+        if (currProcess == null)
+            return "No Process Executing";
+        else
+            return currProcess.getProcessID();
+    }
+
+    public boolean isRunning() {
+        return isRunning;
     }
 }
