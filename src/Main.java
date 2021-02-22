@@ -29,5 +29,15 @@ public class Main {
         Processor processor = new Processor(1, 100, pq);
         //start the processor
         processor.startProcessor();
+
+        try{Thread.sleep(100);}catch(Exception e){}
+
+        while(processor.isRunning()) {
+            System.out.println("Average process duration: " + processor.getAverageProcessDuration());
+            System.out.println("Processes/second: " + processor.getProcessThroughputPerSecond());
+            try{Thread.sleep(100);}catch(Exception e){}
+        }
+        System.out.println("Average process duration: " + processor.getAverageProcessDuration());
+        System.out.println("Processes/second: " + processor.getProcessThroughputPerSecond());
     }
 }

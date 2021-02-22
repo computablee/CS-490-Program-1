@@ -107,4 +107,29 @@ public class Processor {
         for (CPU cpu : CPUs)
             cpu.unpauseSystem();
     }
+
+    /**
+     * Gets average process duration in time units
+     *
+     * @return Average process duration in time units
+     */
+    public double getAverageProcessDuration() {
+        double total = 0;
+        for (CPU cpu : CPUs)
+            total += cpu.getAverageProcessDuration();
+        total /= CPUs.size();
+        return total;
+    }
+
+    /**
+     * Gets process throughput in terms of processes/second
+     *
+     * @return Average process throughput
+     */
+    public double getProcessThroughputPerSecond() {
+        double total = 0;
+        for (CPU cpu : CPUs)
+            total += cpu.getProcessThroughputPerSecond();
+        return total;
+    }
 }

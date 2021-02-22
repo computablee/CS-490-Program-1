@@ -1,5 +1,11 @@
 package Backend;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * Class to represent an individual CPU
  *
@@ -9,7 +15,7 @@ public class CPU implements Runnable {
     //queue associated with this CPU
     private ProcessQueue queue;
     //CPU ID
-    private Integer CPUnum;
+    private final Integer CPUNum;
     //thread for running the CPU
     private Thread t;
     //current executing process
@@ -20,6 +26,12 @@ public class CPU implements Runnable {
     private boolean isRunning;
     //time left remaining in process
     private Integer timeLeft;
+    //time that the CPU started
+    private long startTime;
+    //list of times that processes have completed
+    private final List<Long> completedTimes;
+    //lock for reading/writing to the completedTimes object
+    private Lock completedTimesLock;
 
     /**
      * Constructor
@@ -30,11 +42,14 @@ public class CPU implements Runnable {
     public CPU(int num, int millisecsPerTime) {
         //this is standard constructor stuff, I don't feel like I need to explain
         this.queue = null;
-        this.CPUnum = num;
+        this.CPUNum = num;
         this.currProcess = null;
         this.t = null;
         this.millisecsPerTime = millisecsPerTime;
         this.timeLeft = null;
+        this.startTime = 0;
+        this.completedTimes = new ArrayList<>();
+        this.completedTimesLock = new ReentrantLock();
     }
 
     /**
@@ -52,11 +67,13 @@ public class CPU implements Runnable {
      */
     public void run() {
         //set the isRunning flag to true
-        this.isRunning = true;
+        isRunning = true;
+
+        //get the time that the CPU starts executing processes
+        startTime = new Date().getTime();
 
         //while the queue is not empty
         while (queue.hasProcesses()) {
-
             //pop a process (synchronization is taken care of in the ProcessQue class, don't worry!)
             currProcess = queue.popProcess();
 
@@ -68,7 +85,7 @@ public class CPU implements Runnable {
             //Thread.sleep can throw an InterruptedException, we have to handle that
             try {
                 //output the currently executing process to the console
-                System.out.println("CPU" + CPUnum.toString() + " now executing \"" + currProcess.getProcessID() + "\" for " + millisecsPerTime * currProcess.getServiceTime() + " milliseconds.");
+                System.out.println("CPU" + CPUNum.toString() + " now executing \"" + currProcess.getProcessID() + "\" for " + millisecsPerTime * currProcess.getServiceTime() + " milliseconds.");
 
                 //get the time left as a variable
                 timeLeft = currProcess.getServiceTime();
@@ -84,6 +101,11 @@ public class CPU implements Runnable {
                 //if we were interrupted, simply terminate the thread
                 return;
             }
+
+            //add the current time to the completed times queue, thread-safely
+            completedTimesLock.lock();
+            completedTimes.add(new Date().getTime() - startTime);
+            completedTimesLock.unlock();
         }
 
         //set the current process to null
@@ -91,7 +113,7 @@ public class CPU implements Runnable {
         //set isRunning to false
         this.isRunning = false;
         //output that the CPU has retired
-        System.out.println("CPU" + CPUnum.toString() + " retired.");
+        System.out.println("CPU" + CPUNum.toString() + " retired.");
         //set the thread to null so we can run again if needed
         t = null;
     }
@@ -103,7 +125,7 @@ public class CPU implements Runnable {
         //if we're not already running
         if (t == null) {
             //create the thread on the "this" object
-            t = new Thread(this, "CPU" + CPUnum.toString());
+            t = new Thread(this, "CPU" + CPUNum.toString());
             //start the thread
             t.start();
         }
@@ -114,8 +136,8 @@ public class CPU implements Runnable {
      *
      * @return CPU ID
      */
-    public int getCPUnum() {
-        return CPUnum;
+    public int getCPUNum() {
+        return CPUNum;
     }
 
     /**
@@ -168,5 +190,45 @@ public class CPU implements Runnable {
         //like Thread::suspend, this is deprecated
         //also like Thread::suspend, it does what I want, so I continue to use it
         t.resume();
+    }
+
+    /**
+     * Gets average process duration in time units
+     *
+     * @return Average process duration in time units
+     */
+    public double getAverageProcessDuration() {
+        long total = 0;
+        double average = 0;
+        //lock around all of our completedTimes reads, we don't want it changed while we're relying on it
+        completedTimesLock.lock();
+        //as long as there's at least one process to get data from
+        if (completedTimes.size() > 0) {
+            //this is awful, but since completedTimes measures milliseconds-since-start for each process,
+            //this is how we measure average duration of a process
+            total = completedTimes.get(0);
+            for (int i = 1; i < completedTimes.size(); i++)
+                total += completedTimes.get(i) - completedTimes.get(i - 1);
+            //this is just dividing by number of processes, which a unit conversion from milliseconds to time units
+            average = (double) total / (double) millisecsPerTime / (double) completedTimes.size();
+        }
+        //we're done with completedTimes, unlock the Lock
+        completedTimesLock.unlock();
+        return average;
+    }
+
+    /**
+     * Gets process throughput in terms of processes/second
+     *
+     * @return Average process throughput
+     */
+    public double getProcessThroughputPerSecond() {
+        //lock around all of our completedTimes reads, we don't want it changed while we're relying on it
+        completedTimesLock.lock();
+        //one-liner to get processes per second
+        double throughput = (double)completedTimes.size() / ((double)(new Date().getTime() - startTime) / 1000f);
+        //we're done with completedTimes, unlock the Lock
+        completedTimesLock.unlock();
+        return throughput;
     }
 }
