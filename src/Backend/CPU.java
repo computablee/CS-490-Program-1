@@ -67,7 +67,7 @@ public class CPU implements Runnable {
                 System.out.println("CPU" + CPUnum.toString() + " now executing \"" + currProcess.getProcessID() + "\" for " + millisecsPerTime * currProcess.getServiceTime() + " milliseconds.");
 
                 //sleep for the designated milliseconds
-                Thread.sleep((long)millisecsPerTime * currProcess.getServiceTime());
+                Thread.sleep(millisecsPerTime * currProcess.getServiceTime());
             } catch (InterruptedException e) {
                 //if we were interrupted, simply terminate the thread
                 return;
