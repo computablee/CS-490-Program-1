@@ -26,7 +26,7 @@ public class Main {
         }
 
         //Create the processor with 1 CPU, 100 milliseconds per unit of time, and with all CPUs sharing the same ProcessQueue, pq
-        Processor processor = new Processor(4, 100, pq);
+        Processor processor = new Processor(1, 100, pq);
         //start the processor
         processor.startProcessor();
     }
