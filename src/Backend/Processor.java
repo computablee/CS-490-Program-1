@@ -13,7 +13,7 @@ public class Processor {
     List<CPU> CPUs;
 
     /**
-     * Constructor that does not assign a Backend.ProcessQueue to CPUs
+     * Constructor that does not assign a ProcessQueue to CPUs
      *
      * @param CPUs The number of CPUs on the processor
      * @param millisecsPerTime The number of milliseconds per unit of time
@@ -22,7 +22,7 @@ public class Processor {
         //create an ArrayList defining CPUs
         this.CPUs = new ArrayList<>();
 
-        //instantiate each Backend.CPU
+        //instantiate each CPU
         for (int i = 0; i < CPUs; i++)
             this.CPUs.add(new CPU(i, millisecsPerTime));
     }
@@ -32,22 +32,22 @@ public class Processor {
      *
      * @param CPUs The number of CPUs on the processor
      * @param millisecsPerTime The number of milliseconds per unit of time
-     * @param processQueue The process queue to assign to each Backend.CPU
+     * @param processQueue The process queue to assign to each CPU
      */
     public Processor(int CPUs, int millisecsPerTime, ProcessQueue processQueue) {
         //call other constructor first
         this(CPUs, millisecsPerTime);
 
-        //then assign the process queue to each Backend.CPU
+        //then assign the process queue to each CPU
         for (CPU cpu : this.CPUs)
             cpu.assignQueue(processQueue);
     }
 
     /**
-     * Manually assign a process queue to an individual Backend.CPU
+     * Manually assign a process queue to an individual CPU
      *
      * @param pq The process queue to assign
-     * @param CPU The ID of the Backend.CPU to assign to
+     * @param CPU The ID of the CPU to assign to
      */
     public void assignQueue(ProcessQueue pq, int CPU) {
         this.CPUs.get(CPU).assignQueue(pq);
@@ -63,10 +63,10 @@ public class Processor {
     }
 
     /**
-     * Get executing process on a specific Backend.CPU
+     * Get executing process on a specific CPU
      *
-     * @param CPU The Backend.CPU ID on which to check the executing process
-     * @return The process executing on the specified Backend.CPU
+     * @param CPU The CPU ID on which to check the executing process
+     * @return The process executing on the specified CPU
      */
     public String getExecutingProcess(int CPU) {
         return CPUs.get(CPU).getExecutingProcess();

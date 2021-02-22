@@ -16,7 +16,7 @@ public class Main {
 
         //calling Reader::getData can throw a FileNotFoundException, so we have to handle that
         try {
-            //this is really dumb code that gets a console input from user for a file, then extracts the data from that file into a Backend.ProcessQueue object
+            //this is really dumb code that gets a console input from user for a file, then extracts the data from that file into a ProcessQueue object
             pq = new Reader(new Scanner(System.in).next()).getData();
         } catch (FileNotFoundException e) {
             //print the exception and retire the application
@@ -25,8 +25,8 @@ public class Main {
             return; //code will not compile without this redundant return
         }
 
-        //Create the processor with 1 Backend.CPU, 100 milliseconds per unit of time, and with all CPUs sharing the same Backend.ProcessQueue, pq
-        Processor processor = new Processor(1, 100, pq);
+        //Create the processor with 1 CPU, 100 milliseconds per unit of time, and with all CPUs sharing the same ProcessQueue, pq
+        Processor processor = new Processor(4, 100, pq);
         //start the processor
         processor.startProcessor();
     }
