@@ -18,6 +18,8 @@ public class CPU implements Runnable {
     private int millisecsPerTime;
     //whether or not this specific CPU is running any processes
     private boolean isRunning;
+    //time left remaining in process
+    private Integer timeLeft;
 
     /**
      * Constructor
@@ -32,6 +34,7 @@ public class CPU implements Runnable {
         this.currProcess = null;
         this.t = null;
         this.millisecsPerTime = millisecsPerTime;
+        this.timeLeft = null;
     }
 
     /**
@@ -53,6 +56,7 @@ public class CPU implements Runnable {
 
         //while the queue is not empty
         while (queue.hasProcesses()) {
+
             //pop a process (synchronization is taken care of in the ProcessQue class, don't worry!)
             currProcess = queue.popProcess();
 
@@ -66,8 +70,16 @@ public class CPU implements Runnable {
                 //output the currently executing process to the console
                 System.out.println("CPU" + CPUnum.toString() + " now executing \"" + currProcess.getProcessID() + "\" for " + millisecsPerTime * currProcess.getServiceTime() + " milliseconds.");
 
-                //sleep for the designated milliseconds
-                Thread.sleep(millisecsPerTime * currProcess.getServiceTime());
+                //get the time left as a variable
+                timeLeft = currProcess.getServiceTime();
+
+                //while there is time left in the process
+                while (timeLeft > 0) {
+                    //sleep for the designated milliseconds
+                    Thread.sleep(millisecsPerTime);
+                    //decrement the amount of time left
+                    timeLeft--;
+                }
             } catch (InterruptedException e) {
                 //if we were interrupted, simply terminate the thread
                 return;
@@ -126,5 +138,35 @@ public class CPU implements Runnable {
      */
     public boolean isRunning() {
         return isRunning;
+    }
+
+    /**
+     * Gets the time remaining in the current process
+     *
+     * @return Time units remaining in currently executing process, null if no process is executing
+     */
+    public Integer timeRemaining() {
+        if (currProcess == null)
+            return null;
+        else
+            return timeLeft;
+    }
+
+    /**
+     * Pauses the CPU
+     */
+    public void pauseSystem() {
+        //this method is deprecated
+        //nonetheless, it still exists in Java 15, and it does what I want it to do, so I will continue to use it
+        t.suspend();
+    }
+
+    /**
+     * Unpauses the CPU
+     */
+    public void unpauseSystem() {
+        //like Thread::suspend, this is deprecated
+        //also like Thread::suspend, it does what I want, so I continue to use it
+        t.resume();
     }
 }

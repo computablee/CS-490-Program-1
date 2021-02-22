@@ -89,4 +89,22 @@ public class Processor {
         //return the flag
         return isRunning;
     }
+
+    /**
+     * Pauses the system
+     */
+    public void pauseSystem() {
+        //individually pause each CPU
+        for (CPU cpu : CPUs)
+            cpu.pauseSystem();
+    }
+
+    /**
+     * Unpauses the system
+     */
+    public void unpauseSystem() {
+        //individually unpause each CPU
+        for (CPU cpu : CPUs)
+            cpu.unpauseSystem();
+    }
 }
