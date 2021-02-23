@@ -27,17 +27,7 @@ public class Main {
 
         //Create the processor with 1 CPU, 100 milliseconds per unit of time, and with all CPUs sharing the same ProcessQueue, pq
         Processor processor = new Processor(1, 100, pq);
-        //start the processor
-        processor.startProcessor();
 
-        try{Thread.sleep(100);}catch(Exception e){}
-
-        while(processor.isRunning()) {
-            System.out.println("Average process duration: " + processor.getAverageProcessDuration());
-            System.out.println("Processes/second: " + processor.getProcessThroughputPerSecond());
-            try{Thread.sleep(100);}catch(Exception e){}
-        }
-        System.out.println("Average process duration: " + processor.getAverageProcessDuration());
-        System.out.println("Processes/second: " + processor.getProcessThroughputPerSecond());
+        gui.setProcessor(processor);
     }
 }

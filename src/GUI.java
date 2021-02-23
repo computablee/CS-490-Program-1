@@ -1,3 +1,5 @@
+import Backend.Processor;
+
 import javax.swing.*;
 import java.awt.Color;
 
@@ -7,9 +9,11 @@ public class GUI {
     private JButton startButton;
     private JButton pauseButton;
     private JLabel statusLabel;
+    private Processor processor;
 
     public GUI() {
         javax.swing.SwingUtilities.invokeLater(this::spawnGUI);
+        this.processor = null;
     }
 
     private void spawnGUI() {
@@ -30,11 +34,25 @@ public class GUI {
         statusLabel.setBounds(320, 5, 125, 35);
 
         startButton.addActionListener(e -> {
-            statusLabel.setText("System is Running");
+            if (processor != null && !processor.isRunning()) {
+                processor.startProcessor();
+                statusLabel.setText("System is Running");
+            }
+            else if (processor != null) {
+                processor.unpauseSystem();
+                statusLabel.setText("System is Running");
+            }
+            else {
+                statusLabel.setText("ERR: No input file");
+            }
+
             // add more functionality here once i know wtf is going on
         });
 
         pauseButton.addActionListener(e -> {
+            if (processor != null)
+                processor.pauseSystem();
+
             statusLabel.setText("System is Paused");
             // add more functionality here once i know wtf is going on
         });
@@ -48,5 +66,9 @@ public class GUI {
         frame.pack();
         frame.setSize(500, 500);
         frame.setVisible(true);
+    }
+
+    public void setProcessor(Processor processor) {
+        this.processor = processor;
     }
 }
