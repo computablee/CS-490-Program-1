@@ -12,7 +12,6 @@ public class GUI {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //comment
         //comment number two
-        // i am cooler than charles
         frame.pack();
         frame.setSize(500, 500);
         frame.setVisible(true);
