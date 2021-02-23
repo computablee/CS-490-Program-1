@@ -11,6 +11,7 @@ public class GUI {
         this.frame = new JFrame("CS 490 Application");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //comment
+        //comment number two
         frame.pack();
         frame.setSize(500, 500);
         frame.setVisible(true);
