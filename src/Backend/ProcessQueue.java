@@ -1,9 +1,6 @@
 package Backend;
 
-import java.util.Queue;
-import java.util.PriorityQueue;
-import java.util.Comparator;
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * Class that represents a queue of processes
@@ -13,6 +10,7 @@ import java.util.LinkedList;
 public class ProcessQueue {
     //queue object that represents the processes
     private Queue<Process> processes;
+    private QueueOrdering queueOrdering;
 
     /**
      * Constructor where you can specify the type of queue
@@ -28,6 +26,8 @@ public class ProcessQueue {
         else if (q == QueueOrdering.FIFO)
             //create a LinkedList object
             this.processes = new LinkedList<>();
+        //assign for later use
+        this.queueOrdering = q;
     }
 
     /**
@@ -68,5 +68,33 @@ public class ProcessQueue {
         synchronized(this) {
             return processes.size() > 0;
         }
+    }
+
+    /**
+     * Gets the current queue as an ArrayList, used for GUI stuff
+     * This might be thread-safe; I haven't thoroughly tested, and honestly I'm kinda uncertain
+     * Gets a true copy of the ProcessQueue (though we do not make copies of individual Process objects)
+     *
+     * @return A copy of the ProcessQueue as an ArrayList
+     */
+    public ArrayList<Process> getQueue() {
+        //create the arraylist
+        ArrayList<Process> retVal = new ArrayList<>();
+
+        //synchronize the entire duration that we are using the process object
+        synchronized (this) {
+            //iterate through the processes.size
+            for (int i = 0; i < processes.size(); i++) {
+                //if FIFO
+                if (queueOrdering == QueueOrdering.FIFO)
+                    //copy the location `i` from the linked list into the array list
+                    retVal.add(((LinkedList<Process>)processes).get(i));
+                //if priority
+                else if (queueOrdering == QueueOrdering.Priority)
+                    ;//TODO: Implement a way to add processes to retVal from a Priority Queue
+            }
+        }
+
+        return retVal;
     }
 }
