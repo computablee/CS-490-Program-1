@@ -135,4 +135,7 @@ public class Processor {
     public boolean getIsPaused(int n) {
         return CPUs.get(n).getIsPaused();
     }
+    public Integer timeRemaining(int n) {
+        return CPUs.get(n).timeRemaining();
+    }
 }

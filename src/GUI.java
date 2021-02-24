@@ -126,9 +126,9 @@ public class GUI {
         Timer j = new Timer(1, e -> {
             if(processor != null) {
                 if(processor.isRunning() && !processor.getIsPaused(0)) {
-                    processDetails.setText(" CPU \n Exec: Running\n Time Remaining = [time]");
+                    processDetails.setText(" CPU \n Exec: Running\n Time Remaining = " + processor.timeRemaining(0));
                 } else if(processor.isRunning() && processor.getIsPaused(0)) {
-                    processDetails.setText(" CPU \n Exec: Idle\n Time Remaining = [time]");
+                    processDetails.setText(" CPU \n Exec: Idle\n Time Remaining = " + processor.timeRemaining(0));
                 } else {
                     processDetails.setText(" CPU \n Exec: Idle\n Time Remaining = n/a");
                 }
