@@ -29,5 +29,6 @@ public class Main {
         Processor processor = new Processor(1, 100, pq);
 
         gui.setProcessor(processor);
+        gui.setProcessQueue(pq);
     }
 }
