@@ -3,7 +3,7 @@ import Backend.ProcessQueue;
 import Backend.Process;
 
 import javax.swing.*;
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 
 public class GUI {
@@ -16,6 +16,7 @@ public class GUI {
     private JLabel queueLabel;
     private JLabel timeUnitLabel;
     private JLabel unitLabel;
+    private JLabel enterPrompt;
     private JTextField timeUnit;
     private JTextArea processDetails;
     private JTextArea systemStats;
@@ -24,6 +25,7 @@ public class GUI {
     private Processor processor;
     private ProcessQueue processQueue;
     private String[] tableColumnNames = {"Process Name", "Service Time"};
+    private int unit = 100;
 
 
     public GUI() {
@@ -76,13 +78,23 @@ public class GUI {
         unitLabel.setText("ms");
         unitLabel.setBounds(395, 75, 125, 35);
 
+        this.enterPrompt = new JLabel();
+        enterPrompt.setFont(new Font("", Font.PLAIN, 10));
+        enterPrompt.setText("(Press Enter to Set New Unit)");
+        enterPrompt.setBounds(340, 97, 150, 35);
+
         this.timeUnit = new JTextField(1);
+        timeUnit.setText("100");
         timeUnit.setBounds(340, 75, 50, 35);
-        /*timeUnit.addActionListener(e -> {
+        timeUnit.addActionListener(e -> {
             // Make this change the millisecsPerTime (Processor.java) parameter somehow
             // This action listener will trigger when the user hits Enter, btw
+            this.unit = Integer.parseInt(timeUnit.getText());
+            // System.out.println(unit);
 
-        });*/
+        });
+
+
 
         Timer t = new Timer(1, e -> {
             if(processQueue != null) {
@@ -132,6 +144,7 @@ public class GUI {
         panel.add(queueLabel);
         panel.add(timeUnitLabel);
         panel.add(unitLabel);
+        panel.add(enterPrompt);
         panel.add(timeUnit);
         panel.add(processDetails);
         panel.add(systemStats);
@@ -148,5 +161,9 @@ public class GUI {
 
     public void setProcessQueue(ProcessQueue processQueue) {
         this.processQueue = processQueue;
+    }
+
+    public int getTimeUnit() {
+        return this.unit;
     }
 }
