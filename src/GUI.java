@@ -11,10 +11,16 @@ public class GUI {
     private JPanel panel;
     private JButton startButton;
     private JButton pauseButton;
+    private JButton fileButton;
     private JLabel statusLabel;
     private JLabel queueLabel;
+    private JLabel timeUnitLabel;
+    private JLabel unitLabel;
     private JTextField timeUnit;
+    private JTextArea processDetails;
+    private JTextArea systemStats;
     private JTable waitingProcessQueue;
+    private JScrollPane processScrollPane;
     private Processor processor;
     private ProcessQueue processQueue;
     private String[] tableColumnNames = {"Process Name", "Service Time"};
@@ -28,6 +34,7 @@ public class GUI {
     private void spawnGUI() {
         this.frame = new JFrame("CS 490 Application");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         this.panel = new JPanel();
         panel.setLayout(null);
 
@@ -46,9 +53,36 @@ public class GUI {
         queueLabel.setText("Waiting Process Queue");
         queueLabel.setBounds(50, 75, 150, 35);
 
-        this.timeUnit = new JTextField(1);
-        timeUnit.setBounds(320, 75, 125, 35);
+        this.timeUnitLabel = new JLabel();
+        timeUnitLabel.setText("1 time unit =");
+        timeUnitLabel.setBounds(265, 75, 125, 35);
 
+        this.processDetails = new JTextArea();
+        processDetails.setBounds(240, 123, 200, 75);
+        processDetails.setBackground(Color.yellow);
+        processDetails.setBorder(BorderFactory.createLineBorder(Color.orange));
+        processDetails.setEditable(false);
+        // Don't know what this needs to display
+        // processDetails.append to add things here
+
+        this.systemStats = new JTextArea();
+        systemStats.setBounds(20, 225, 420, 150);
+        systemStats.setBorder(BorderFactory.createLineBorder(Color.black));
+        systemStats.setEditable(false);
+        // Don't know what this needs to display
+        // systemStats.appends to add things here
+
+        this.unitLabel = new JLabel();
+        unitLabel.setText("ms");
+        unitLabel.setBounds(395, 75, 125, 35);
+
+        this.timeUnit = new JTextField(1);
+        timeUnit.setBounds(340, 75, 50, 35);
+        /*timeUnit.addActionListener(e -> {
+            // Make this change the millisecsPerTime (Processor.java) parameter somehow
+            // This action listener will trigger when the user hits Enter, btw
+
+        });*/
 
         Timer t = new Timer(1, e -> {
             if(processQueue != null) {
@@ -60,8 +94,10 @@ public class GUI {
                     processQueue2dArr[i][1] = String.valueOf(processQueueArr[i].getServiceTime());
                 }
                 this.waitingProcessQueue = new JTable(processQueue2dArr, tableColumnNames);
-                waitingProcessQueue.setBounds(50, 110, 125, 80);
-                panel.add(waitingProcessQueue);
+                this.processScrollPane = new JScrollPane(waitingProcessQueue);
+                processScrollPane.setBounds(20, 110, 200, 100);
+                panel.add(processScrollPane);
+
             }
         });
         t.start();
@@ -79,7 +115,6 @@ public class GUI {
                 statusLabel.setText("ERR: No input file");
             }
 
-            // add more functionality here once i know wtf is going on
         });
 
         pauseButton.addActionListener(e -> {
@@ -87,7 +122,7 @@ public class GUI {
                 processor.pauseSystem();
 
             statusLabel.setText("System is Paused");
-            // add more functionality here once i know wtf is going on
+
         });
 
         panel.setBorder(BorderFactory.createLineBorder(Color.black));
@@ -95,7 +130,11 @@ public class GUI {
         panel.add(pauseButton);
         panel.add(statusLabel);
         panel.add(queueLabel);
+        panel.add(timeUnitLabel);
+        panel.add(unitLabel);
         panel.add(timeUnit);
+        panel.add(processDetails);
+        panel.add(systemStats);
         frame.setContentPane(panel);
         frame.getContentPane().setBackground(Color.lightGray);
         frame.pack();
