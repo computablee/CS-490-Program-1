@@ -1,6 +1,7 @@
 import Backend.Processor;
 import Backend.ProcessQueue;
 import Backend.Process;
+import Backend.CPU;
 
 import javax.swing.*;
 import java.awt.*;
@@ -64,8 +65,16 @@ public class GUI {
         processDetails.setBackground(Color.yellow);
         processDetails.setBorder(BorderFactory.createLineBorder(Color.orange));
         processDetails.setEditable(false);
+
+        this.processDetails = new JTextArea();
+        processDetails.setBounds(240, 123, 200, 75);
+        processDetails.setBackground(Color.yellow);
+        processDetails.setBorder(BorderFactory.createLineBorder(Color.orange));
+        processDetails.setEditable(false);
+
         // Don't know what this needs to display
         // processDetails.append to add things here
+
 
         this.systemStats = new JTextArea();
         systemStats.setBounds(20, 225, 420, 150);
@@ -114,10 +123,24 @@ public class GUI {
         });
         t.start();
 
+        Timer j = new Timer(1, e -> {
+            if(processor != null) {
+                if(processor.isRunning()) {
+                    processDetails.setText(" CPU \n Exec: Running\n Time Remaining = [time]");
+                } else {
+                    processDetails.setText(" CPU \n Exec: Idle\n Time Remaining = n/a");
+                }
+            }
+        });
+        j.start();
+
+
         startButton.addActionListener(e -> {
             if (processor != null && !processor.isRunning()) {
                 processor.startProcessor();
                 statusLabel.setText("System is Running");
+
+
             }
             else if (processor != null) {
                 processor.unpauseSystem();
@@ -130,9 +153,9 @@ public class GUI {
         });
 
         pauseButton.addActionListener(e -> {
-            if (processor != null)
+            if (processor != null && processor.isRunning())
                 processor.pauseSystem();
-
+                //processDetails.setText(" CPU \n Exec: Idle\n Time Remaining = [time]");
             statusLabel.setText("System is Paused");
 
         });
