@@ -132,4 +132,7 @@ public class Processor {
             total += cpu.getProcessThroughputPerSecond();
         return total;
     }
+    public boolean getIsPaused(int n) {
+        return CPUs.get(n).getIsPaused();
+    }
 }
