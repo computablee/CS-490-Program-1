@@ -138,7 +138,7 @@ public class GUI {
         // Timer to allow the program to wait until the process queue is not null
         Timer t = new Timer(1, e -> {
             if(pq != null) {
-                // Convert the processQueue into a 2d array compatable with a JTable
+                // Convert the processQueue from an ArrayList into a 2d array compatible with a JTable
                 ArrayList<Process> procq = pq.getQueue();
                 Process[] processQueueArr = procq.toArray(new Process[procq.size()]);
                 String[][] processQueue2dArr = new String[processQueueArr.length][2];
