@@ -40,43 +40,45 @@ public class GUI {
     }
 
     private void spawnGUI() {
-
+        // Create the frame window for the GUI
         this.frame = new JFrame("CS 490 Application");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Exits the program completely upon closing GUI
 
+        // Create the panel on which to place all GUI elements
         this.panel = new JPanel();
         panel.setLayout(null);
 
+        // Create and position start button
         this.startButton = new JButton("Start System");
         startButton.setBounds(30, 80, 125, 35);
 
+        // Create and position pause button
         this.pauseButton = new JButton("Pause System");
         pauseButton.setBounds(175, 80, 125, 35);
 
+        // Create and position label to display the status of the system
         this.statusLabel = new JLabel();
         statusLabel.setText("System is Idle");
         statusLabel.setBounds(320, 80, 125, 35);
 
+        // Create and position label to identify the process queue
         this.queueLabel = new JLabel();
         queueLabel.setText("Waiting Process Queue");
         queueLabel.setBounds(50, 125, 150, 35);
 
+        // Create and position label to identify time unit text box
         this.timeUnitLabel = new JLabel();
         timeUnitLabel.setText("1 time unit =");
         timeUnitLabel.setBounds(265, 125, 125, 35);
 
+        // Create and position a read-only text area to display the details of the current process queue
         this.processDetails = new JTextArea();
         processDetails.setBounds(240, 173, 200, 75);
         processDetails.setBackground(Color.yellow);
         processDetails.setBorder(BorderFactory.createLineBorder(Color.orange));
         processDetails.setEditable(false);
 
-        this.processDetails = new JTextArea();
-        processDetails.setBounds(240, 173, 200, 75);
-        processDetails.setBackground(Color.yellow);
-        processDetails.setBorder(BorderFactory.createLineBorder(Color.orange));
-        processDetails.setEditable(false);
-
+        // Create and position a read-only text area to display system statistics (NOT YET IMPLEMENTED)
         this.systemStats = new JTextArea();
         systemStats.setBounds(20, 275, 420, 150);
         systemStats.setBorder(BorderFactory.createLineBorder(Color.black));
@@ -84,16 +86,20 @@ public class GUI {
         // Don't know what this needs to display
         // systemStats.appends to add things here
 
+        // Create and position a label to prompt the user to enter their desired file location
         this.filePrompt = new JLabel();
         filePrompt.setText("Input the File Location of the processes: ");
         filePrompt.setBounds(30, 5, 250, 35);
 
+        // Create and position a text field to take user input for a filepath
         this.fileLocation = new JTextField();
         fileLocation.setBounds(30, 33, 270, 25);
 
+        // Create and position a button to confirm the user's filepath entry
         this.fileButton = new JButton("OK");
         fileButton.setBounds(305, 33, 55, 25);
 
+        // Action listener to read from the user's chosen file upon clicking the fileButton
         fileButton.addActionListener(e -> {
             try {
                 //this is really dumb code that gets a console input from user for a file, then extracts the data from that file into a ProcessQueue object
@@ -107,22 +113,28 @@ public class GUI {
             }
         });
 
+        // Create and position a label to display the unit of time the program uses (milliseconds)
         this.unitLabel = new JLabel();
         unitLabel.setText("ms");
         unitLabel.setBounds(395, 125, 125, 35);
 
+        // Create and position a label to tell the user to hit Enter after entering their desired time
         this.enterPrompt = new JLabel();
         enterPrompt.setFont(new Font("", Font.PLAIN, 10));
         enterPrompt.setText("(Press Enter to Set New Unit)");
         enterPrompt.setBounds(340, 145, 150, 35);
 
+        // Create and position a text field to read the user's time unit input (Default 100)
         this.timeUnit = new JTextField(1);
         timeUnit.setText("100");
         timeUnit.setBounds(340, 130, 50, 25);
+
+        // Action listener that reads in the user's input after they press Enter
         timeUnit.addActionListener(e -> {
             this.unit = Integer.parseInt(timeUnit.getText());
 
         });
+
 
         Timer t = new Timer(1, e -> {
             if(pq != null) {
