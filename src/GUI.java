@@ -198,7 +198,4 @@ public class GUI {
         frame.setVisible(true);
     }
 
-    public int getTimeUnit() {
-        return this.unit;
-    }
 }
