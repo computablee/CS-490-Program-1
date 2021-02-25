@@ -135,16 +135,19 @@ public class GUI {
 
         });
 
-
+        // Timer to allow the program to wait until the process queue is not null
         Timer t = new Timer(1, e -> {
             if(pq != null) {
+                // Convert the processQueue into a 2d array compatable with a JTable
                 ArrayList<Process> procq = pq.getQueue();
                 Process[] processQueueArr = procq.toArray(new Process[procq.size()]);
                 String[][] processQueue2dArr = new String[processQueueArr.length][2];
+                //Populate the 2d array
                 for(int i = 0; i < processQueueArr.length; i++) {
                     processQueue2dArr[i][0] = processQueueArr[i].getProcessID();
                     processQueue2dArr[i][1] = String.valueOf(processQueueArr[i].getServiceTime());
                 }
+                //Create and position JTable responsible for process queue
                 this.waitingProcessQueue = new JTable(processQueue2dArr, tableColumnNames);
                 this.processScrollPane = new JScrollPane(waitingProcessQueue);
                 processScrollPane.setBounds(20, 160, 200, 100);
