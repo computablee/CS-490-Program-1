@@ -132,9 +132,21 @@ public class Processor {
             total += cpu.getProcessThroughputPerSecond();
         return total;
     }
+
+    /**
+     * Gets boolean of if process is paused
+     *
+     * @return true if paused, false otherwise
+     */
     public boolean getIsPaused(int n) {
         return CPUs.get(n).getIsPaused();
     }
+
+    /**
+     * Gets time remaining to complete the current process
+     *
+     * @return Time remaining on current process
+     */
     public Integer timeRemaining(int n) {
         return CPUs.get(n).timeRemaining();
     }

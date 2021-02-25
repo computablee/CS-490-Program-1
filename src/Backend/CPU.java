@@ -237,6 +237,12 @@ public class CPU implements Runnable {
         completedTimesLock.unlock();
         return throughput;
     }
+
+    /**
+     * Gets boolean of if process is paused
+     *
+     * @return true if paused, false otherwise
+     */
     public boolean getIsPaused() {
         return isPaused;
     }
