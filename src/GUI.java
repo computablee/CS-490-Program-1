@@ -154,6 +154,7 @@ public class GUI {
         });
         t.start();
 
+        // Determines the current status of the running process in order to display the correct information
         Timer j = new Timer(1, e -> {
             if(processor != null) {
                 if(processor.isRunning() && !processor.getIsPaused(0)) {
@@ -168,6 +169,7 @@ public class GUI {
         });
         j.start();
 
+        // Start button - Starts the system and creates a processor, and unpauses a paused system
         startButton.addActionListener(e -> {
             if (processor != null) {
                 processor.unpauseSystem();
@@ -181,6 +183,7 @@ public class GUI {
 
         });
 
+        // Pause button - Pauses the system if it is currently running
         pauseButton.addActionListener(e -> {
             if (processor != null && processor.isRunning())
                 processor.pauseSystem();
@@ -189,6 +192,7 @@ public class GUI {
 
         });
 
+        // Adds all of the GUI elements to the main panel and frame
         panel.setBorder(BorderFactory.createLineBorder(Color.black));
         panel.add(startButton);
         panel.add(pauseButton);
@@ -203,11 +207,11 @@ public class GUI {
         panel.add(timeUnit);
         panel.add(processDetails);
         panel.add(systemStats);
-        frame.setContentPane(panel);
-        frame.getContentPane().setBackground(Color.lightGray);
+        frame.setContentPane(panel); // Sets 'panel' as the content display
+        frame.getContentPane().setBackground(Color.lightGray); // Colors the background of the frame gray
         frame.pack();
-        frame.setSize(500, 500);
-        frame.setVisible(true);
+        frame.setSize(500, 500); // Sets window size to 500x500
+        frame.setVisible(true); // Allows everything to be visible
     }
 
 }
