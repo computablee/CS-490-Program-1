@@ -120,10 +120,7 @@ public class GUI {
         timeUnit.setText("100");
         timeUnit.setBounds(340, 130, 50, 25);
         timeUnit.addActionListener(e -> {
-            // Make this change the millisecsPerTime (Processor.java) parameter somehow
-            // This action listener will trigger when the user hits Enter, btw
             this.unit = Integer.parseInt(timeUnit.getText());
-            // System.out.println(unit);
 
         });
 
@@ -180,8 +177,6 @@ public class GUI {
 
         });
 
-
-
         panel.setBorder(BorderFactory.createLineBorder(Color.black));
         panel.add(startButton);
         panel.add(pauseButton);
@@ -202,14 +197,6 @@ public class GUI {
         frame.setSize(500, 500);
         frame.setVisible(true);
     }
-
-    /*public void setProcessor(Processor processor) {
-        this.processor = processor;
-    }
-
-    public void setProcessQueue(ProcessQueue processQueue) {
-        this.processQueue = processQueue;
-    }*/
 
     public int getTimeUnit() {
         return this.unit;
