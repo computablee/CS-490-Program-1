@@ -32,6 +32,8 @@ public class CPU implements Runnable {
     private final List<Long> completedTimes;
     //lock for reading/writing to the completedTimes object
     private Lock completedTimesLock;
+    //
+    private boolean isPaused;
 
     /**
      * Constructor
@@ -50,6 +52,7 @@ public class CPU implements Runnable {
         this.startTime = 0;
         this.completedTimes = new ArrayList<>();
         this.completedTimesLock = new ReentrantLock();
+        this.isPaused = true;
     }
 
     /**
@@ -128,6 +131,7 @@ public class CPU implements Runnable {
             t = new Thread(this, "CPU" + CPUNum.toString());
             //start the thread
             t.start();
+            isPaused = false;
         }
     }
 
@@ -181,6 +185,7 @@ public class CPU implements Runnable {
         //this method is deprecated
         //nonetheless, it still exists in Java 15, and it does what I want it to do, so I will continue to use it
         t.suspend();
+        isPaused = true;
     }
 
     /**
@@ -190,6 +195,7 @@ public class CPU implements Runnable {
         //like Thread::suspend, this is deprecated
         //also like Thread::suspend, it does what I want, so I continue to use it
         t.resume();
+        isPaused = false;
     }
 
     /**
@@ -230,5 +236,14 @@ public class CPU implements Runnable {
         //we're done with completedTimes, unlock the Lock
         completedTimesLock.unlock();
         return throughput;
+    }
+
+    /**
+     * Gets boolean of if process is paused
+     *
+     * @return true if paused, false otherwise
+     */
+    public boolean getIsPaused() {
+        return isPaused;
     }
 }
