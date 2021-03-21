@@ -178,7 +178,7 @@ public class GUI {
                 processor.unpauseSystem();
             }
             else {
-                processor = new Processor(1, unit, pq);
+                processor = new Processor(2, unit, pq);
                 processor.startProcessor();
 
             }
