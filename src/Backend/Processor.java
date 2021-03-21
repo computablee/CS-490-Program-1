@@ -1,7 +1,7 @@
 package Backend;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Class to represent the processor of a system
@@ -11,6 +11,8 @@ import java.util.List;
 public class Processor {
     //List of all CPUs
     List<CPU> CPUs;
+    //List of all process statistics
+    Queue<ProcessStatistics> processStatistics;
 
     /**
      * Constructor that does not assign a ProcessQueue to CPUs
@@ -22,9 +24,11 @@ public class Processor {
         //create an ArrayList defining CPUs
         this.CPUs = new ArrayList<>();
 
+        this.processStatistics = new ConcurrentLinkedQueue<ProcessStatistics>();
+
         //instantiate each CPU
         for (int i = 0; i < CPUs; i++)
-            this.CPUs.add(new CPU(i, millisecsPerTime));
+            this.CPUs.add(new CPU(i, millisecsPerTime, this.processStatistics));
     }
 
     /**
@@ -106,31 +110,6 @@ public class Processor {
         //individually unpause each CPU
         for (CPU cpu : CPUs)
             cpu.unpauseSystem();
-    }
-
-    /**
-     * Gets average process duration in time units
-     *
-     * @return Average process duration in time units
-     */
-    public double getAverageProcessDuration() {
-        double total = 0;
-        for (CPU cpu : CPUs)
-            total += cpu.getAverageProcessDuration();
-        total /= CPUs.size();
-        return total;
-    }
-
-    /**
-     * Gets process throughput in terms of processes/second
-     *
-     * @return Average process throughput
-     */
-    public double getProcessThroughputPerSecond() {
-        double total = 0;
-        for (CPU cpu : CPUs)
-            total += cpu.getProcessThroughputPerSecond();
-        return total;
     }
 
     /**
