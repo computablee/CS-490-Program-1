@@ -103,9 +103,11 @@ public class CPU implements Runnable {
                     Thread.sleep(millisecsPerTime);
                     //decrement the amount of time left
                     timeLeft--;
+                    //increment the current time
+                    currentTime++;
                 }
 
-                currProcessStatistics.setFinishTime(currentTime += currProcess.getServiceTime());
+                currProcessStatistics.setFinishTime(currentTime);
                 currProcessStatistics.setTat(currentTime - currProcess.getArrivalTime());
                 currProcessStatistics.setNtat(currProcessStatistics.getTat() / currProcess.getServiceTime());
 
@@ -210,5 +212,9 @@ public class CPU implements Runnable {
      */
     public boolean getIsPaused() {
         return isPaused;
+    }
+
+    public int getCurrentTime() {
+        return currentTime;
     }
 }
