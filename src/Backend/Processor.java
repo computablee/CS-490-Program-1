@@ -131,4 +131,23 @@ public class Processor {
     public Integer timeRemaining(int n) {
         return CPUs.get(n).timeRemaining();
     }
+
+    /**
+     * Gets the list of process statistics as an ArrayList
+     *
+     * @return Process statistics as an ArrayList
+     */
+    public List<ProcessStatistics> getProcessStatistics() {
+        ProcessStatistics[] temp = new ProcessStatistics[0];
+        return Arrays.asList(processStatistics.toArray(temp));
+    }
+
+    /**
+     * Gets the current throughput of the processor
+     *
+     * @return Number of completed processes over elapsed time
+     */
+    public int getCurrentThroughput() {
+        return getProcessStatistics().size() / CPUs.get(0).getCurrentTime();
+    }
 }
