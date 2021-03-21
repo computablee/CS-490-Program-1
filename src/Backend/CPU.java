@@ -3,6 +3,7 @@ package Backend;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -28,12 +29,12 @@ public class CPU implements Runnable {
     private Integer timeLeft;
     //time that the CPU started
     private long startTime;
-    //list of times that processes have completed
-    private final List<Long> completedTimes;
-    //lock for reading/writing to the completedTimes object
-    private Lock completedTimesLock;
-    //
+    //is paused
     private boolean isPaused;
+    //shared process statistics ArrayList
+    private Queue<ProcessStatistics> processStatistics;
+    //current processor time
+    int currentTime;
 
     /**
      * Constructor
@@ -41,7 +42,7 @@ public class CPU implements Runnable {
      * @param num CPU ID on processor
      * @param millisecsPerTime Milliseconds per unit of time
      */
-    public CPU(int num, int millisecsPerTime) {
+    public CPU(int num, int millisecsPerTime, Queue<ProcessStatistics> processStatistics) {
         //this is standard constructor stuff, I don't feel like I need to explain
         this.queue = null;
         this.CPUNum = num;
@@ -50,9 +51,9 @@ public class CPU implements Runnable {
         this.millisecsPerTime = millisecsPerTime;
         this.timeLeft = null;
         this.startTime = 0;
-        this.completedTimes = new ArrayList<>();
-        this.completedTimesLock = new ReentrantLock();
         this.isPaused = true;
+        this.processStatistics = processStatistics;
+        this.currentTime = 0;
     }
 
     /**
@@ -87,6 +88,9 @@ public class CPU implements Runnable {
 
             //Thread.sleep can throw an InterruptedException, we have to handle that
             try {
+                //current process statistics
+                ProcessStatistics currProcessStatistics = new ProcessStatistics(currProcess);
+
                 //output the currently executing process to the console
                 System.out.println("CPU" + CPUNum.toString() + " now executing \"" + currProcess.getProcessID() + "\" for " + millisecsPerTime * currProcess.getServiceTime() + " milliseconds.");
 
@@ -100,15 +104,16 @@ public class CPU implements Runnable {
                     //decrement the amount of time left
                     timeLeft--;
                 }
+
+                currProcessStatistics.setFinishTime(currentTime += currProcess.getServiceTime());
+                currProcessStatistics.setTat(currentTime - currProcess.getArrivalTime());
+                currProcessStatistics.setNtat(currProcessStatistics.getTat() / currProcess.getServiceTime());
+
+                processStatistics.add(currProcessStatistics);
             } catch (InterruptedException e) {
                 //if we were interrupted, simply terminate the thread
                 return;
             }
-
-            //add the current time to the completed times queue, thread-safely
-            completedTimesLock.lock();
-            completedTimes.add(new Date().getTime() - startTime);
-            completedTimesLock.unlock();
         }
 
         //set the current process to null
@@ -196,46 +201,6 @@ public class CPU implements Runnable {
         //also like Thread::suspend, it does what I want, so I continue to use it
         t.resume();
         isPaused = false;
-    }
-
-    /**
-     * Gets average process duration in time units
-     *
-     * @return Average process duration in time units
-     */
-    public double getAverageProcessDuration() {
-        long total = 0;
-        double average = 0;
-        //lock around all of our completedTimes reads, we don't want it changed while we're relying on it
-        completedTimesLock.lock();
-        //as long as there's at least one process to get data from
-        if (completedTimes.size() > 0) {
-            //this is awful, but since completedTimes measures milliseconds-since-start for each process,
-            //this is how we measure average duration of a process
-            total = completedTimes.get(0);
-            for (int i = 1; i < completedTimes.size(); i++)
-                total += completedTimes.get(i) - completedTimes.get(i - 1);
-            //this is just dividing by number of processes, which a unit conversion from milliseconds to time units
-            average = (double) total / (double) millisecsPerTime / (double) completedTimes.size();
-        }
-        //we're done with completedTimes, unlock the Lock
-        completedTimesLock.unlock();
-        return average;
-    }
-
-    /**
-     * Gets process throughput in terms of processes/second
-     *
-     * @return Average process throughput
-     */
-    public double getProcessThroughputPerSecond() {
-        //lock around all of our completedTimes reads, we don't want it changed while we're relying on it
-        completedTimesLock.lock();
-        //one-liner to get processes per second
-        double throughput = (double)completedTimes.size() / ((double)(new Date().getTime() - startTime) / 1000f);
-        //we're done with completedTimes, unlock the Lock
-        completedTimesLock.unlock();
-        return throughput;
     }
 
     /**
