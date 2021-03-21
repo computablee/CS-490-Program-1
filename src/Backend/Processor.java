@@ -134,18 +134,20 @@ public class Processor {
     }
 
     /**
-     * Gets boolean of if process is paused
+     * Gets whether a specific CPU is paused
      *
-     * @return true if paused, false otherwise
+     * @param n The CPU to check
+     * @return Whether or not CPU n is paused
      */
     public boolean getIsPaused(int n) {
         return CPUs.get(n).getIsPaused();
     }
 
     /**
-     * Gets time remaining to complete the current process
+     * Gets time remaining on the current executing process on a specific CPU
      *
-     * @return Time remaining on current process
+     * @param n The CPU to check
+     * @return Time remaining on CPU n
      */
     public Integer timeRemaining(int n) {
         return CPUs.get(n).timeRemaining();
