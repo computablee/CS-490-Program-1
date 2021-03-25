@@ -147,7 +147,8 @@ public class Processor {
      *
      * @return Number of completed processes over elapsed time
      */
-    public int getCurrentThroughput() {
-        return getProcessStatistics().size() / CPUs.get(0).getCurrentTime();
+    public float getCurrentThroughput() {
+        int currTime = CPUs.get(0).getCurrentTime();
+        return (float)getProcessStatistics().size() / (float)(currTime != 0 ? currTime : 1);
     }
 }

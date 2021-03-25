@@ -6,7 +6,7 @@ public class ProcessStatistics {
     private int serviceTime;
     private Integer finishTime;
     private Integer tat;
-    private Integer ntat;
+    private Float ntat;
 
     public ProcessStatistics(Process process) {
         this.process = process;
@@ -25,7 +25,7 @@ public class ProcessStatistics {
         this.tat = tat;
     }
 
-    public void setNtat(Integer ntat) {
+    public void setNtat(Float ntat) {
         this.ntat = ntat;
     }
 
@@ -37,7 +37,7 @@ public class ProcessStatistics {
         return tat;
     }
 
-    public Integer getNtat() {
+    public Float getNtat() {
         return ntat;
     }
 
