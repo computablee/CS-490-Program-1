@@ -109,7 +109,7 @@ public class CPU implements Runnable {
 
                 currProcessStatistics.setFinishTime(currentTime);
                 currProcessStatistics.setTat(currentTime - currProcess.getArrivalTime());
-                currProcessStatistics.setNtat(currProcessStatistics.getTat() / currProcess.getServiceTime());
+                currProcessStatistics.setNtat((float)currProcessStatistics.getTat() / (float)currProcess.getServiceTime());
 
                 processStatistics.add(currProcessStatistics);
             } catch (InterruptedException e) {
