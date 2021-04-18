@@ -34,7 +34,7 @@ public class CPU implements Runnable {
     private boolean isPaused;
     //shared process statistics ArrayList
     private Queue<ProcessStatistics> processStatistics;
-    //current processor time
+    //current processor time, element in the RR schedule, the RR time quantum, and the amount of time currently remaining in the RR queue
     int currentTime, currentRRElem, rrTimeQuantum, rrTimeRemaining;
 
     /**
@@ -69,20 +69,36 @@ public class CPU implements Runnable {
         this.queue = pq;
     }
 
+    /**
+     * Gets the next process to execute depending on the type of queue (HRRN or Round Robin)
+     *
+     * @return The next process to execute
+     * @throws InterruptedException idk this is something for Thread.sleep
+     */
     private Process getNextProcess() throws InterruptedException {
+        //if the queue is empty, return null
         if (queue.count() == 0) return null;
 
+        //if HRRN
         if (queue.getQueueOrdering() == QueueOrdering.HRRN) {
+            //Create an array of response ratios
             ArrayList<Double> responseRatio = new ArrayList<>();
 
+            //Calculate response ratios for each process
             for (int i = 0; i < queue.count(); i++) {
                 Process p = queue.get(i);
-                responseRatio.add(((double) currentTime - (double) p.getArrivalTime() + (double) p.getServiceTime()) / (double) p.getServiceTime());
+                //if the process hasn't arrived yet, set its response ratio to -1
+                if (p.getArrivalTime() < currentTime)
+                    responseRatio.add(-1.0);
+                //else calculate its response ratio
+                else
+                    responseRatio.add(((double) currentTime - (double) p.getArrivalTime() + (double) p.getServiceTime()) / (double) p.getServiceTime());
             }
 
             int maxElem = -1;
             double max = 0;
 
+            //find the max
             for (int i = 0; i < queue.count(); i++) {
                 if (responseRatio.get(i) > max) {
                     max = responseRatio.get(i);
@@ -90,6 +106,7 @@ public class CPU implements Runnable {
                 }
             }
 
+            //if the process isn't the system yet
             if (max < 1.0) {
                 //sleep for the designated milliseconds
                 Thread.sleep(millisecsPerTime);
@@ -98,24 +115,60 @@ public class CPU implements Runnable {
                 //try again
                 return null;
             } else {
+                //get the process
                 Process retProc = queue.get(maxElem);
+                //remove it from the queue
                 queue.removeProcessAt(maxElem);
+                //and return it
                 return retProc;
             }
-        } else if (queue.getQueueOrdering() == QueueOrdering.RR) {
-            if (currentRRElem >= 0 && queue.get(currentRRElem).timeLeft <= 0)
+        }
+        //if round robin
+        else if (queue.getQueueOrdering() == QueueOrdering.RR) {
+            //if the current element has no time left, remove it from the system
+            if (currentRRElem >= 0 && queue.get(currentRRElem).timeLeft <= 0) {
+                //remove the current process
                 queue.removeProcessAt(currentRRElem);
-            else
-                currentRRElem++;
 
+                //SPAGHETTI CODE ALERT AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                //this basically makes sure we select a new element in a round robin fashion that is currently in the system
+                //there is a variant of this on line 148, but this one is specific to the case that we didn't have to remove an element
+                int init = currentRRElem;
+                while (queue.get(currentRRElem).getArrivalTime() >= currentTime){
+                    currentRRElem++;
+                    currentRRElem %= queue.count();
+                    //if this is true, no processes are actually in the system currently
+                    if (init == currentRRElem)
+                        return null;
+                }
+            }
+            else {
+                //MORE SPAGHETTI CODE ALERT AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                //this basically makes sure we select a new element in a round robin fashion that is currently in the system
+                int init = currentRRElem;
+                do {
+                    currentRRElem++;
+                    currentRRElem %= queue.count();
+                    //if this is true, no processes are actually in the system currently
+                    if (init == currentRRElem)
+                        return null;
+                } while (queue.get(currentRRElem).getArrivalTime() >= currentTime);
+            }
+
+            //if the queue is empty, return null
             if (queue.count() == 0)
                 return null;
 
+            //set the new remaining time in the current quantum
             rrTimeRemaining = rrTimeQuantum;
-            currentRRElem %= queue.count();
+            //return the selected element
             return queue.get(currentRRElem);
         } else {
-            return queue.get(0);
+            //this will never trigger
+            //if for some godforesaken reason it does, just treat it like a FIFO queue
+            Process p = queue.get(0);
+            queue.removeProcessAt(0);
+            return p;
         }
     }
 
@@ -148,18 +201,20 @@ public class CPU implements Runnable {
                 //output the currently executing process to the console
                 System.out.println("CPU" + CPUNum.toString() + " now executing \"" + currProcess.getProcessID() + "\" for " + millisecsPerTime * currProcess.timeLeft + " milliseconds.");
 
-                //while there is time left in the process
+                //while there is time left in the process and time left in the round robin quantum
                 while (currProcess.timeLeft > 0 && rrTimeRemaining > 0) {
                     //sleep for the designated milliseconds
                     Thread.sleep(millisecsPerTime);
                     //decrement the amount of time left in the process and the RR time quantum
                     currProcess.timeLeft--;
+                    //if the queue is set to RR, decrement the time remaining in the quantum
                     if (queue.getQueueOrdering() == QueueOrdering.RR)
                         rrTimeRemaining--;
                     //increment the current time
                     currentTime++;
                 }
 
+                //set some process statistics
                 currProcessStatistics.setFinishTime(currentTime);
                 currProcessStatistics.setTat(currentTime - currProcess.getArrivalTime());
                 currProcessStatistics.setNtat((float)currProcessStatistics.getTat() / (float)currProcess.getServiceTime());
@@ -267,6 +322,10 @@ public class CPU implements Runnable {
         return isPaused;
     }
 
+    /**
+     * get the current time
+     * @return the current time
+     */
     public int getCurrentTime() {
         return currentTime;
     }

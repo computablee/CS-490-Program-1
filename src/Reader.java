@@ -32,7 +32,7 @@ public class Reader {
      * @throws FileNotFoundException Throws if file is not found
      */
     public ArrayList<ProcessQueue> getData() throws FileNotFoundException {
-        //Create a ProcessQueue object with FIFO ordering (instead of priority ordering)
+        //Create a couple of ProcessQueue objects with different orderings
         ArrayList<ProcessQueue> processQueue = new ArrayList<>();
         processQueue.add(new ProcessQueue(QueueOrdering.HRRN));
         processQueue.add(new ProcessQueue(QueueOrdering.RR));

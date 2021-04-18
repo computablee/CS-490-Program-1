@@ -37,14 +37,30 @@ public class ProcessQueue {
         }
     }
 
+    /**
+     * Adds a process to the queue
+     *
+     * @param process The process to add
+     */
     public void addProcess(Process process) {
         this.processes.add(process);
     }
 
+    /**
+     * Removes a process at an index
+     *
+     * @param i Index at which to remove a process
+     */
     public void removeProcessAt(int i) {
         this.processes.remove(i);
     }
 
+    /**
+     * Gets a process at an index
+     *
+     * @param i Index at which to retrieve a process
+     * @return Process at that index
+     */
     public Process get(int i) {
         return this.processes.get(i);
     }
@@ -72,10 +88,20 @@ public class ProcessQueue {
         return retVal;
     }
 
+    /**
+     * Gets the queue ordering
+     *
+     * @return The current queue ordering
+     */
     public QueueOrdering getQueueOrdering() {
         return this.queueOrdering;
     }
 
+    /**
+     * Gets the number of elements in the queue
+     *
+     * @return the number of elements in the queue
+     */
     public int count() {
         return processes.size();
     }

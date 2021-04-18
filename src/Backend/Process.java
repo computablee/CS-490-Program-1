@@ -58,6 +58,11 @@ public class Process {
      */
     public int getPriority() { return this.priority; }
 
+    /**
+     * Deep copies a process
+     *
+     * @return A deep copy of the current process
+     */
     public Process deepCopy() {
         Process copiedProcess = new Process(this.arrivalTime, this.processID, this.serviceTime, this.priority);
 
