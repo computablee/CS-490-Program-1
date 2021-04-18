@@ -244,7 +244,7 @@ public class GUI {
                 this.cpuZeroAvgNTAT = cpuZeroNTATSum / processor.getProcessStatistics(0).size();
 
                 // Display average NTAT of CPU 0 and update every tick of the Timer
-                cpuZeroNTATLabel.setText("Current Average NTAT: " + cpuZeroAvgNTAT);
+                cpuZeroNTATLabel.setText("Current Average nTAT: " + cpuZeroAvgNTAT);
 
                 List<ProcessStatistics> cpuOneProcStats = processor.getProcessStatistics(1);
                 String[][] cpuOneProcStatsMatrix = new String[cpuOneProcStats.size()][6];
@@ -264,7 +264,7 @@ public class GUI {
                 this.cpuOneAvgNTAT = cpuOneNTATSum / processor.getProcessStatistics(1).size();
 
                 // Display average NTAT of CPU 0 and update every tick of the Timer
-                cpuOneNTATLabel.setText("Current Average NTAT: " + cpuOneAvgNTAT);
+                cpuOneNTATLabel.setText("Current Average nTAT: " + cpuOneAvgNTAT);
                 
                 // Create and position a JTable responsible for displaying finished processes and their stats
                 this.cpuZeroProcessStats = new JTable(cpuZeroProcStatsMatrix, psTableColumnNames);
