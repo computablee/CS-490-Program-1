@@ -25,9 +25,9 @@ public class Processor {
         this.CPUs = new ArrayList<>();
 
         //create the array of process statistics
-        this.processStatistics = new ArrayList<>(CPUs);
+        this.processStatistics = new ArrayList<>();
         for (int i = 0; i < CPUs; i++)
-            this.processStatistics.set(i, new ConcurrentLinkedQueue<ProcessStatistics>());
+            this.processStatistics.add(new ConcurrentLinkedQueue<ProcessStatistics>());
 
         //instantiate each CPU
         for (int i = 0; i < CPUs; i++)
@@ -140,9 +140,9 @@ public class Processor {
      *
      * @return Process statistics as an ArrayList
      */
-    public List<ProcessStatistics> getProcessStatistics() {
+    public List<ProcessStatistics> getProcessStatistics(int i) {
         ProcessStatistics[] temp = new ProcessStatistics[0];
-        return Arrays.asList(processStatistics.toArray(temp));
+        return Arrays.asList(processStatistics.get(i).toArray(temp));
     }
 
     /**
@@ -150,8 +150,8 @@ public class Processor {
      *
      * @return Number of completed processes over elapsed time
      */
-    public float getCurrentThroughput() {
+    public float getCurrentThroughput(int i) {
         int currTime = CPUs.get(0).getCurrentTime();
-        return (float)getProcessStatistics().size() / (float)(currTime != 0 ? currTime : 1);
+        return (float)getProcessStatistics(i).size() / (float)(currTime != 0 ? currTime : 1);
     }
 }

@@ -1,5 +1,6 @@
 package Backend;
 
+import java.awt.image.AreaAveragingScaleFilter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -34,7 +35,7 @@ public class CPU implements Runnable {
     //shared process statistics ArrayList
     private Queue<ProcessStatistics> processStatistics;
     //current processor time
-    int currentTime;
+    int currentTime, currentRRElem, rrTimeQuantum, rrTimeRemaining;
 
     /**
      * Constructor
@@ -54,6 +55,9 @@ public class CPU implements Runnable {
         this.isPaused = true;
         this.processStatistics = processStatistics;
         this.currentTime = 0;
+        this.currentRRElem = -1;
+        this.rrTimeQuantum = 2;
+        this.rrTimeRemaining = this.rrTimeQuantum;
     }
 
     /**
@@ -63,6 +67,56 @@ public class CPU implements Runnable {
      */
     public void assignQueue(ProcessQueue pq) {
         this.queue = pq;
+    }
+
+    private Process getNextProcess() throws InterruptedException {
+        if (queue.count() == 0) return null;
+
+        if (queue.getQueueOrdering() == QueueOrdering.HRRN) {
+            ArrayList<Double> responseRatio = new ArrayList<>();
+
+            for (int i = 0; i < queue.count(); i++) {
+                Process p = queue.get(i);
+                responseRatio.add(((double) currentTime - (double) p.getArrivalTime() + (double) p.getServiceTime()) / (double) p.getServiceTime());
+            }
+
+            int maxElem = -1;
+            double max = 0;
+
+            for (int i = 0; i < queue.count(); i++) {
+                if (responseRatio.get(i) > max) {
+                    max = responseRatio.get(i);
+                    maxElem = i;
+                }
+            }
+
+            if (max < 1.0) {
+                //sleep for the designated milliseconds
+                Thread.sleep(millisecsPerTime);
+                //increment current time
+                currentTime++;
+                //try again
+                return null;
+            } else {
+                Process retProc = queue.get(maxElem);
+                queue.removeProcessAt(maxElem);
+                return retProc;
+            }
+        } else if (queue.getQueueOrdering() == QueueOrdering.RR) {
+            if (currentRRElem >= 0 && queue.get(currentRRElem).timeLeft <= 0)
+                queue.removeProcessAt(currentRRElem);
+            else
+                currentRRElem++;
+
+            if (queue.count() == 0)
+                return null;
+
+            rrTimeRemaining = rrTimeQuantum;
+            currentRRElem %= queue.count();
+            return queue.get(currentRRElem);
+        } else {
+            return queue.get(0);
+        }
     }
 
     /**
@@ -78,31 +132,30 @@ public class CPU implements Runnable {
 
         //while the queue is not empty
         while (queue.hasProcesses()) {
-            //pop a process (synchronization is taken care of in the ProcessQue class, don't worry!)
-            currProcess = queue.popProcess();
-
-            //even though we checked if the queue was not empty, there is a chance that another thread has already stolen the last item
-            //in this case, we want to check if the popProcess method returned null, and if it did, do not attempt to execute any more code
-            if (currProcess == null)
-                break;
-
             //Thread.sleep can throw an InterruptedException, we have to handle that
             try {
+                //pop a process (synchronization is taken care of in the ProcessQue class, don't worry!)
+                currProcess = getNextProcess();
+
+                //even though we checked if the queue was not empty, there is a chance that another thread has already stolen the last item
+                //in this case, we want to check if the popProcess method returned null, and if it did, do not attempt to execute any more code
+                if (currProcess == null)
+                    continue;
+
                 //current process statistics
                 ProcessStatistics currProcessStatistics = new ProcessStatistics(currProcess);
 
                 //output the currently executing process to the console
-                System.out.println("CPU" + CPUNum.toString() + " now executing \"" + currProcess.getProcessID() + "\" for " + millisecsPerTime * currProcess.getServiceTime() + " milliseconds.");
-
-                //get the time left as a variable
-                timeLeft = currProcess.getServiceTime();
+                System.out.println("CPU" + CPUNum.toString() + " now executing \"" + currProcess.getProcessID() + "\" for " + millisecsPerTime * currProcess.timeLeft + " milliseconds.");
 
                 //while there is time left in the process
-                while (timeLeft > 0) {
+                while (currProcess.timeLeft > 0 && rrTimeRemaining > 0) {
                     //sleep for the designated milliseconds
                     Thread.sleep(millisecsPerTime);
-                    //decrement the amount of time left
-                    timeLeft--;
+                    //decrement the amount of time left in the process and the RR time quantum
+                    currProcess.timeLeft--;
+                    if (queue.getQueueOrdering() == QueueOrdering.RR)
+                        rrTimeRemaining--;
                     //increment the current time
                     currentTime++;
                 }

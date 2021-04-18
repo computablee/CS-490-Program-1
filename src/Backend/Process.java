@@ -14,6 +14,8 @@ public class Process {
     private int serviceTime;
     //priority
     private int priority;
+    //time left
+    public int timeLeft;
 
     /**
      * Constructor
@@ -29,6 +31,7 @@ public class Process {
         this.processID = processID;
         this.serviceTime = serviceTime;
         this.priority = priority;
+        this.timeLeft = serviceTime;
     }
 
     /**

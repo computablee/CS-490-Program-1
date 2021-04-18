@@ -33,9 +33,9 @@ public class Reader {
      */
     public ArrayList<ProcessQueue> getData() throws FileNotFoundException {
         //Create a ProcessQueue object with FIFO ordering (instead of priority ordering)
-        ArrayList<ProcessQueue> processQueue = new ArrayList<>(2);
-        processQueue.set(0, new ProcessQueue(QueueOrdering.HRRN));
-        processQueue.set(1, new ProcessQueue(QueueOrdering.RR));
+        ArrayList<ProcessQueue> processQueue = new ArrayList<>();
+        processQueue.add(new ProcessQueue(QueueOrdering.HRRN));
+        processQueue.add(new ProcessQueue(QueueOrdering.RR));
 
         //Open the file
         Scanner s = new Scanner(new File(this.fileName));
@@ -54,7 +54,7 @@ public class Reader {
             Process p = new Process(at, pid, st, prty);
             //push the process to the process queue
             processQueue.get(0).addProcess(p);
-            processQueue.get(1).addProcess(p);
+            processQueue.get(1).addProcess(p.deepCopy());
         }
 
         //close the file

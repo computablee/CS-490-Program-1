@@ -146,6 +146,8 @@ public class GUI {
         Timer t = new Timer(1, e -> {
             if(pq != null) {
                 // Convert the processQueue from an ArrayList into a 2d array compatible with a JTable
+
+                //TODO: FIX THIS
                 /*ArrayList<Process> procq = pq.getQueue();
                 Process[] processQueueArr = procq.toArray(new Process[procq.size()]);
                 String[][] processQueue2dArr = new String[processQueueArr.length][2];
@@ -181,10 +183,13 @@ public class GUI {
                 }
 
                 // Display throughput and update every tick of the Timer
-                throughputLabel.setText("Current Throughput: " + processor.getCurrentThroughput() + " process/unit of time");
+                //TODO: FIX THIS
+                //throughputLabel.setText("Current Throughput: " + processor.getCurrentThroughput() + " process/unit of time");
 
                 // Display the stats of finished processes
-                List<ProcessStatistics> procStats = processor.getProcessStatistics();
+
+                //TODO: FIX THIS
+                /*List<ProcessStatistics> procStats = processor.getProcessStatistics();
                 String[][] processStatisticsMatrix = new String[procStats.size()][6]; // Create a 2D array based on procStats, with 6 fields for statistics
                 // Populate the 2D array
                 for(int i = 0; i < processor.getProcessStatistics().size(); i++)
@@ -200,7 +205,7 @@ public class GUI {
                 this.processStatisticsTable = new JTable(processStatisticsMatrix, psTableColumnNames);
                 this.procStatScrollPane = new JScrollPane(processStatisticsTable);
                 procStatScrollPane.setBounds(5, 375, 550, 150);
-                panel.add(procStatScrollPane);
+                panel.add(procStatScrollPane);*/
 
             }
 

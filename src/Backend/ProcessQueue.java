@@ -45,6 +45,10 @@ public class ProcessQueue {
         this.processes.remove(i);
     }
 
+    public Process get(int i) {
+        return this.processes.get(i);
+    }
+
     /**
      * Gets the current queue as an ArrayList, used for GUI stuff
      * This might be thread-safe; I haven't thoroughly tested, and honestly I'm kinda uncertain
@@ -68,15 +72,11 @@ public class ProcessQueue {
         return retVal;
     }
 
-    public ProcessQueue deepCopy() {
-        ProcessQueue copiedQueue = new ProcessQueue(this.queueOrdering);
+    public QueueOrdering getQueueOrdering() {
+        return this.queueOrdering;
+    }
 
-        ArrayList<Process> processes = getQueue();
-
-        for (Process p : processes) {
-            copiedQueue.addProcess(p.deepCopy());
-        }
-
-        return copiedQueue;
+    public int count() {
+        return processes.size();
     }
 }
