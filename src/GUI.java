@@ -115,7 +115,7 @@ public class GUI {
         // Action listener to read from the user's chosen file upon clicking the fileButton
         fileButton.addActionListener(e -> {
             try {
-                //this is really dumb code that gets a console input from user for a file, then extracts the data from that file into a ProcessQueue object
+                // Gets a console input from user for a file, then extracts the data from that file into a ProcessQueue object
                 pq = new Reader(new Scanner(fileLocation.getText()).next()).getData();
                 System.out.println(pq);
             } catch (FileNotFoundException ex) {
@@ -155,10 +155,12 @@ public class GUI {
         timeUnit.setText("100");
         timeUnit.setBounds(1075, 25, 50, 25);
 
+        // Create and position a label to display the current RR time quantum
         this.timeQuantumLabel = new JLabel();
         timeQuantumLabel.setText("<html>Round Robin Time Quantum: </html>");
         timeQuantumLabel.setBounds(820, 190, 100, 35);
 
+        // Create and position a text field to read the users' RR time quantum (Default 1)
         this.timeQuantum = new JTextField(1);
         timeQuantum.setText("1");
         timeQuantum.setBounds(920, 195, 50, 25);
@@ -223,9 +225,7 @@ public class GUI {
                     statusLabel.setText("System is Idle");
                 }
 
-
-
-                // Display the stats of CPU 0'S finished processes
+                // Display the stats of CPU 0's finished processes
                 List<ProcessStatistics> cpuZeroProcStats = processor.getProcessStatistics(0);
                 String[][] cpuZeroProcStatsMatrix = new String[cpuZeroProcStats.size()][6]; // Create a 2D array based on cpuZeroProcStats, with 6 fields for statistics
                 // Populate the 2D array
@@ -241,11 +241,13 @@ public class GUI {
                     cpuZeroNTATSum += cpuZeroProcStats.get(i).getNtat();
                 }
 
+                // Calculate average nTAT for CPU 0
                 this.cpuZeroAvgNTAT = cpuZeroNTATSum / processor.getProcessStatistics(0).size();
 
                 // Display average NTAT of CPU 0 and update every tick of the Timer
                 cpuZeroNTATLabel.setText("Current Average nTAT: " + cpuZeroAvgNTAT);
 
+                // Display the stats of CPU 1's finished processes
                 List<ProcessStatistics> cpuOneProcStats = processor.getProcessStatistics(1);
                 String[][] cpuOneProcStatsMatrix = new String[cpuOneProcStats.size()][6];
                 // Populate the 2D Array
@@ -261,17 +263,19 @@ public class GUI {
                     cpuOneNTATSum += cpuOneProcStats.get(i).getNtat();
                 }
 
+                // Calculate average nTAT for CPU 1
                 this.cpuOneAvgNTAT = cpuOneNTATSum / processor.getProcessStatistics(1).size();
 
                 // Display average NTAT of CPU 0 and update every tick of the Timer
                 cpuOneNTATLabel.setText("Current Average nTAT: " + cpuOneAvgNTAT);
                 
-                // Create and position a JTable responsible for displaying finished processes and their stats
+                // Create and position a JTable responsible for displaying CPU 0's finished processes and their stats
                 this.cpuZeroProcessStats = new JTable(cpuZeroProcStatsMatrix, psTableColumnNames);
                 this.cpuZeroProcStatScrollPane = new JScrollPane(cpuZeroProcessStats);
                 cpuZeroProcStatScrollPane.setBounds(20, 375, 550, 150);
                 panel.add(cpuZeroProcStatScrollPane);
 
+                // Create and position a JTable responsible for displaying CPU 1's finished processes and their stats
                 this.cpuOneProcessStats = new JTable(cpuOneProcStatsMatrix, psTableColumnNames);
                 this.cpuOneProcStatScrollPane = new JScrollPane(cpuOneProcessStats);
                 cpuOneProcStatScrollPane.setBounds(600, 375, 550, 150);
@@ -331,7 +335,7 @@ public class GUI {
         frame.setContentPane(panel); // Sets 'panel' as the content display
         frame.getContentPane().setBackground(Color.lightGray); // Colors the background of the frame gray
         frame.pack();
-        frame.setSize(1190, 600); // Sets window size to 500x600
+        frame.setSize(1190, 600); // Sets window size to 1190x600
         frame.setVisible(true); // Allows everything to be visible
     }
 
