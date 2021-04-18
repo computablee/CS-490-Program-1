@@ -254,6 +254,17 @@ public class CPU implements Runnable {
             }
         }
 
+        if (queue.getQueueOrdering() == QueueOrdering.HRRN) {
+            //current process statistics
+            ProcessStatistics currProcessStatistics = new ProcessStatistics(currProcess);
+            //set some process statistics
+            currProcessStatistics.setFinishTime(currentTime);
+            currProcessStatistics.setTat(currentTime - currProcess.getArrivalTime());
+            currProcessStatistics.setNtat((float) currProcessStatistics.getTat() / (float) currProcess.getServiceTime());
+
+            processStatistics.add(currProcessStatistics);
+        }
+
         //set the current process to null
         currProcess = null;
         //set isRunning to false
