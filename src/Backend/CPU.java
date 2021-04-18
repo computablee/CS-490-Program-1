@@ -69,6 +69,21 @@ public class CPU implements Runnable {
         this.queue = pq;
     }
 
+    /**
+     * Sets the RR time quantum for this CPU
+     *
+     * @param q Time quantum in units of time
+     */
+    public void setRRTimeQuantum(int q) {
+        this.rrTimeQuantum = q;
+        this.rrTimeRemaining = this.rrTimeQuantum;
+    }
+
+    /**
+     * Gets the number of processes in the queue (such that their arrival time is <= the current time
+     *
+     * @return Number of processes in the queue
+     */
     private int inQueueProcesses() {
         int total = 0;
         for (int i = 0; i < queue.count(); i++)
@@ -89,14 +104,16 @@ public class CPU implements Runnable {
 
         //if HRRN
         if (queue.getQueueOrdering() == QueueOrdering.HRRN) {
-            //current process statistics
-            ProcessStatistics currProcessStatistics = new ProcessStatistics(currProcess);
-            //set some process statistics
-            currProcessStatistics.setFinishTime(currentTime);
-            currProcessStatistics.setTat(currentTime - currProcess.getArrivalTime());
-            currProcessStatistics.setNtat((float)currProcessStatistics.getTat() / (float)currProcess.getServiceTime());
+            if (currProcess != null) {
+                //current process statistics
+                ProcessStatistics currProcessStatistics = new ProcessStatistics(currProcess);
+                //set some process statistics
+                currProcessStatistics.setFinishTime(currentTime);
+                currProcessStatistics.setTat(currentTime - currProcess.getArrivalTime());
+                currProcessStatistics.setNtat((float) currProcessStatistics.getTat() / (float) currProcess.getServiceTime());
 
-            processStatistics.add(currProcessStatistics);
+                processStatistics.add(currProcessStatistics);
+            }
 
             //Create an array of response ratios
             ArrayList<Double> responseRatio = new ArrayList<>();

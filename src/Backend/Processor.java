@@ -15,6 +15,17 @@ public class Processor {
     ArrayList<Queue<ProcessStatistics>> processStatistics;
 
     /**
+     * Sets the RR time quantum for the processor
+     *
+     * @param q Time quantum in units of time
+     */
+    public void setRRTimeQuantum(int q) {
+        for (CPU cpu : CPUs) {
+            cpu.setRRTimeQuantum(q);
+        }
+    }
+
+    /**
      * Constructor that does not assign a ProcessQueue to CPUs
      *
      * @param CPUs The number of CPUs on the processor
