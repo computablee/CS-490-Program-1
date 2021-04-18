@@ -17,25 +17,35 @@ public class GUI {
     private JButton pauseButton;
     private JButton fileButton;
     private JLabel statusLabel;
-    private JLabel queueLabel;
+    private JLabel cpuZeroQueueLabel;
+    private JLabel cpuOneQueueLabel;
     private JLabel timeUnitLabel;
     private JLabel unitLabel;
+    private JLabel timeQuantumLabel;
     private JLabel enterPrompt;
+    private JLabel enterPromptQuantum;
     private JLabel filePrompt;
-    private JLabel throughputLabel;
+    private JLabel cpuZeroNTATLabel;
+    private JLabel cpuOneNTATLabel;
     private JTextField timeUnit;
+    private JTextField timeQuantum;
     private JTextField fileLocation;
     private JTextArea firstCPUDetails;
     private JTextArea secondCPUDetails;
-    private JTextArea systemStats;
-    private JTable waitingProcessQueue;
-    private JTable processStatisticsTable;
-    private JScrollPane processScrollPane;
-    private JScrollPane procStatScrollPane;
+    private JTable cpuZeroProcessQueue;
+    private JTable cpuOneProcessQueue;
+    private JTable cpuZeroProcessStats;
+    private JTable cpuOneProcessStats;
+    private JScrollPane cpuZeroScrollPane;
+    private JScrollPane cpuOneScrollPane;
+    private JScrollPane cpuZeroProcStatScrollPane;
+    private JScrollPane cpuOneProcStatScrollPane;
     private Processor processor;
     private String[] tableColumnNames = {"Process Name", "Service Time"};
     private String[] psTableColumnNames = {"Process Name", "Arrival Time", "Service Time", "Finish Time", "TAT", "nTAT"};
     private int unit = 100;
+    private float cpuZeroAvgNTAT;
+    private float cpuOneAvgNTAT;
     private ArrayList<ProcessQueue> pq;
 
     public GUI() {
@@ -54,37 +64,37 @@ public class GUI {
 
         // Create and position start button
         this.startButton = new JButton("Start System");
-        startButton.setBounds(30, 80, 125, 35);
+        startButton.setBounds(500, 33, 125, 35);
 
         // Create and position pause button
         this.pauseButton = new JButton("Pause System");
-        pauseButton.setBounds(175, 80, 125, 35);
+        pauseButton.setBounds(650, 33, 125, 35);
 
         // Create and position label to display the status of the system
         this.statusLabel = new JLabel();
         statusLabel.setText("System is Idle");
-        statusLabel.setBounds(320, 80, 125, 35);
+        statusLabel.setBounds(595, 5, 125, 35);
 
-        // Create and position label to identify the process queue
-        this.queueLabel = new JLabel();
-        queueLabel.setText("Waiting Process Queue");
-        queueLabel.setBounds(50, 125, 150, 35);
+        // Create and position label to identify the process queue for CPU 0
+        this.cpuZeroQueueLabel = new JLabel();
+        cpuZeroQueueLabel.setText("Waiting Process Queue");
+        cpuZeroQueueLabel.setBounds(50, 75, 150, 35);
 
-        // Create and position label to identify time unit text box
-        this.timeUnitLabel = new JLabel();
-        timeUnitLabel.setText("1 time unit =");
-        timeUnitLabel.setBounds(265, 125, 125, 35);
+        // Create and position label to identify the process queue for CPU 1
+        this.cpuOneQueueLabel = new JLabel();
+        cpuOneQueueLabel.setText("Waiting Process Queue");
+        cpuOneQueueLabel.setBounds(630, 75, 150, 35);
 
-        // Create and position a read-only text area to display the details of CPU 1
+        // Create and position a read-only text area to display the details of CPU 0
         this.firstCPUDetails = new JTextArea();
-        firstCPUDetails.setBounds(240, 173, 200, 75);
+        firstCPUDetails.setBounds(240, 110, 200, 75);
         firstCPUDetails.setBackground(Color.yellow);
         firstCPUDetails.setBorder(BorderFactory.createLineBorder(Color.orange));
         firstCPUDetails.setEditable(false);
 
-        // Create and position a second read-only text area to display the details of CPU 2
+        // Create and position a second read-only text area to display the details of CPU 1
         this.secondCPUDetails = new JTextArea();
-        secondCPUDetails.setBounds(240, 275, 200, 75);
+        secondCPUDetails.setBounds(820, 110, 200, 75);
         secondCPUDetails.setBackground(Color.yellow);
         secondCPUDetails.setBorder(BorderFactory.createLineBorder(Color.orange));
         secondCPUDetails.setEditable(false);
@@ -116,51 +126,82 @@ public class GUI {
             }
         });
 
-        // Create and position a label to display the current throughput
-        this.throughputLabel = new JLabel();
-        throughputLabel.setBounds(20, 530, 420, 35);
+        // Create and position a label to display the current average NTAT of CPU 0
+        this.cpuZeroNTATLabel = new JLabel();
+        cpuZeroNTATLabel.setBounds(20, 525, 420, 35);
+
+        // Create and position a label to display the current average NTAT of CPU 1
+        this.cpuOneNTATLabel = new JLabel();
+        cpuOneNTATLabel.setBounds(600, 525, 420, 35);
+
+        // Create and position label to identify time unit text box
+        this.timeUnitLabel = new JLabel();
+        timeUnitLabel.setText("1 time unit =");
+        timeUnitLabel.setBounds(1000, 20, 125, 35);
 
         // Create and position a label to display the unit of time the program uses (milliseconds)
         this.unitLabel = new JLabel();
         unitLabel.setText("ms");
-        unitLabel.setBounds(395, 125, 125, 35);
+        unitLabel.setBounds(1130, 20, 125, 35);
 
         // Create and position a label to tell the user to hit Enter after entering their desired time
-        this.enterPrompt = new JLabel();
+        /*this.enterPrompt = new JLabel();
         enterPrompt.setFont(new Font("", Font.PLAIN, 10));
         enterPrompt.setText("(Press Enter to Set New Unit)");
-        enterPrompt.setBounds(340, 145, 150, 35);
+        enterPrompt.setBounds(1015, 40, 150, 35);*/
 
         // Create and position a text field to read the user's time unit input (Default 100)
         this.timeUnit = new JTextField(1);
         timeUnit.setText("100");
-        timeUnit.setBounds(340, 130, 50, 25);
+        timeUnit.setBounds(1075, 25, 50, 25);
 
-        // Action listener that reads in the user's input after they press Enter
-        timeUnit.addActionListener(e -> {
-            this.unit = Integer.parseInt(timeUnit.getText());
+        this.timeQuantumLabel = new JLabel();
+        timeQuantumLabel.setText("<html>Round Robin Time Quantum: </html>");
+        timeQuantumLabel.setBounds(820, 190, 100, 35);
 
-        });
+        this.timeQuantum = new JTextField(1);
+        timeQuantum.setText("1");
+        timeQuantum.setBounds(920, 195, 50, 25);
+
+        /*this.enterPromptQuantum = new JLabel();
+        enterPromptQuantum.setFont(new Font("", Font.PLAIN, 10));
+        enterPromptQuantum.setText("(Press Enter to Set New Quantum)");
+        enterPromptQuantum.setBounds(820, 215, 175, 35);*/
 
         // Timer to poll every millisecond to check the back end for changes
         Timer t = new Timer(1, e -> {
             if(pq != null) {
-                // Convert the processQueue from an ArrayList into a 2d array compatible with a JTable
-
-                //TODO: FIX THIS
-                /*ArrayList<Process> procq = pq.getQueue();
-                Process[] processQueueArr = procq.toArray(new Process[procq.size()]);
-                String[][] processQueue2dArr = new String[processQueueArr.length][2];
+                // Convert CPU0 process queue from an ArrayList into a 2D array compatible with a JTable
+                ArrayList<Process> cpuZeroProcQ = pq.get(0).getQueue();
+                Process[] cpuZeroPQArr = cpuZeroProcQ.toArray(new Process[cpuZeroProcQ.size()]);
+                String[][] cpuZeroPQMatrix = new String[cpuZeroPQArr.length][2];
                 // Populate the 2D array
-                for(int i = 0; i < processQueueArr.length; i++) {
-                    processQueue2dArr[i][0] = processQueueArr[i].getProcessID();
-                    processQueue2dArr[i][1] = String.valueOf(processQueueArr[i].getServiceTime());
+                for(int i = 0; i < cpuZeroPQArr.length; i++) {
+                    cpuZeroPQMatrix[i][0] = cpuZeroPQArr[i].getProcessID();
+                    cpuZeroPQMatrix[i][1] = String.valueOf(cpuZeroPQArr[i].getServiceTime());
                 }
-                // Create and position JTable responsible for process queue
-                this.waitingProcessQueue = new JTable(processQueue2dArr, tableColumnNames);
-                this.processScrollPane = new JScrollPane(waitingProcessQueue);
-                processScrollPane.setBounds(20, 160, 200, 190);
-                panel.add(processScrollPane);*/
+
+                // Convert CPU 1 process queue from an ArrayList into a 2D array compatible with a JTable
+                ArrayList<Process> cpuOneProcQ = pq.get(1).getQueue();
+                Process[] cpuOnePQArr = cpuOneProcQ.toArray(new Process[cpuOneProcQ.size()]);
+                String[][] cpuOnePQMatrix = new String[cpuOnePQArr.length][2];
+                // Populate the 2D array
+                for(int i = 0; i < cpuOnePQArr.length; i++) {
+                    cpuOnePQMatrix[i][0] = cpuOnePQArr[i].getProcessID();
+                    cpuOnePQMatrix[i][1] = String.valueOf(cpuOnePQArr[i].getServiceTime());
+                }
+                
+                // Create and position JTable responsible for CPU 0 process queue
+                this.cpuZeroProcessQueue = new JTable(cpuZeroPQMatrix, tableColumnNames);
+                this.cpuZeroScrollPane = new JScrollPane(cpuZeroProcessQueue);
+                cpuZeroScrollPane.setBounds(20, 110, 200, 190);
+                panel.add(cpuZeroScrollPane);
+
+                // Create and position JTable responsible for CPU 1 process queue
+                this.cpuOneProcessQueue = new JTable(cpuOnePQMatrix, tableColumnNames);
+                this.cpuOneScrollPane = new JScrollPane(cpuOneProcessQueue);
+                cpuOneScrollPane.setBounds(600, 110, 200, 190);
+                panel.add(cpuOneScrollPane);
 
             }
 
@@ -182,30 +223,59 @@ public class GUI {
                     statusLabel.setText("System is Idle");
                 }
 
-                // Display throughput and update every tick of the Timer
-                //TODO: FIX THIS
-                //throughputLabel.setText("Current Throughput: " + processor.getCurrentThroughput() + " process/unit of time");
 
-                // Display the stats of finished processes
 
-                //TODO: FIX THIS
-                /*List<ProcessStatistics> procStats = processor.getProcessStatistics();
-                String[][] processStatisticsMatrix = new String[procStats.size()][6]; // Create a 2D array based on procStats, with 6 fields for statistics
+                // Display the stats of CPU 0'S finished processes
+                List<ProcessStatistics> cpuZeroProcStats = processor.getProcessStatistics(0);
+                String[][] cpuZeroProcStatsMatrix = new String[cpuZeroProcStats.size()][6]; // Create a 2D array based on cpuZeroProcStats, with 6 fields for statistics
                 // Populate the 2D array
-                for(int i = 0; i < processor.getProcessStatistics().size(); i++)
+                float cpuZeroNTATSum = 0.0f;
+                for(int i = 0; i < processor.getProcessStatistics(0).size(); i++)
                 {
-                    processStatisticsMatrix[i][0] = String.valueOf(procStats.get(i).getProcess().getProcessID());
-                    processStatisticsMatrix[i][1] = String.valueOf(procStats.get(i).getArrivalTime());
-                    processStatisticsMatrix[i][2] = String.valueOf(procStats.get(i).getServiceTime());
-                    processStatisticsMatrix[i][3] = String.valueOf(procStats.get(i).getFinishTime());
-                    processStatisticsMatrix[i][4] = String.valueOf(procStats.get(i).getTat());
-                    processStatisticsMatrix[i][5] = String.valueOf(procStats.get(i).getNtat());
+                    cpuZeroProcStatsMatrix[i][0] = String.valueOf(cpuZeroProcStats.get(i).getProcess().getProcessID());
+                    cpuZeroProcStatsMatrix[i][1] = String.valueOf(cpuZeroProcStats.get(i).getArrivalTime());
+                    cpuZeroProcStatsMatrix[i][2] = String.valueOf(cpuZeroProcStats.get(i).getServiceTime());
+                    cpuZeroProcStatsMatrix[i][3] = String.valueOf(cpuZeroProcStats.get(i).getFinishTime());
+                    cpuZeroProcStatsMatrix[i][4] = String.valueOf(cpuZeroProcStats.get(i).getTat());
+                    cpuZeroProcStatsMatrix[i][5] = String.valueOf(cpuZeroProcStats.get(i).getNtat());
+                    cpuZeroNTATSum += cpuZeroProcStats.get(i).getNtat();
                 }
+
+                this.cpuZeroAvgNTAT = cpuZeroNTATSum / processor.getProcessStatistics(0).size();
+
+                // Display average NTAT of CPU 0 and update every tick of the Timer
+                cpuZeroNTATLabel.setText("Current Average NTAT: " + cpuZeroAvgNTAT);
+
+                List<ProcessStatistics> cpuOneProcStats = processor.getProcessStatistics(1);
+                String[][] cpuOneProcStatsMatrix = new String[cpuOneProcStats.size()][6];
+                // Populate the 2D Array
+                float cpuOneNTATSum = 0.0f;
+                for(int i = 0; i < processor.getProcessStatistics(1).size(); i++)
+                {
+                    cpuOneProcStatsMatrix[i][0] = String.valueOf(cpuOneProcStats.get(i).getProcess().getProcessID());
+                    cpuOneProcStatsMatrix[i][1] = String.valueOf(cpuOneProcStats.get(i).getArrivalTime());
+                    cpuOneProcStatsMatrix[i][2] = String.valueOf(cpuOneProcStats.get(i).getServiceTime());
+                    cpuOneProcStatsMatrix[i][3] = String.valueOf(cpuOneProcStats.get(i).getFinishTime());
+                    cpuOneProcStatsMatrix[i][4] = String.valueOf(cpuOneProcStats.get(i).getTat());
+                    cpuOneProcStatsMatrix[i][5] = String.valueOf(cpuOneProcStats.get(i).getNtat());
+                    cpuOneNTATSum += cpuOneProcStats.get(i).getNtat();
+                }
+
+                this.cpuOneAvgNTAT = cpuOneNTATSum / processor.getProcessStatistics(1).size();
+
+                // Display average NTAT of CPU 0 and update every tick of the Timer
+                cpuOneNTATLabel.setText("Current Average NTAT: " + cpuOneAvgNTAT);
+                
                 // Create and position a JTable responsible for displaying finished processes and their stats
-                this.processStatisticsTable = new JTable(processStatisticsMatrix, psTableColumnNames);
-                this.procStatScrollPane = new JScrollPane(processStatisticsTable);
-                procStatScrollPane.setBounds(5, 375, 550, 150);
-                panel.add(procStatScrollPane);*/
+                this.cpuZeroProcessStats = new JTable(cpuZeroProcStatsMatrix, psTableColumnNames);
+                this.cpuZeroProcStatScrollPane = new JScrollPane(cpuZeroProcessStats);
+                cpuZeroProcStatScrollPane.setBounds(20, 375, 550, 150);
+                panel.add(cpuZeroProcStatScrollPane);
+
+                this.cpuOneProcessStats = new JTable(cpuOneProcStatsMatrix, psTableColumnNames);
+                this.cpuOneProcStatScrollPane = new JScrollPane(cpuOneProcessStats);
+                cpuOneProcStatScrollPane.setBounds(600, 375, 550, 150);
+                panel.add(cpuOneProcStatScrollPane);
 
             }
 
@@ -218,9 +288,11 @@ public class GUI {
                 processor.unpauseSystem();
             }
             else {
+                this.unit = Integer.parseInt(timeUnit.getText());
                 processor = new Processor(2, unit, pq);
                 processor.startProcessor();
-
+                processor.setRRTimeQuantum(Integer.parseInt(timeQuantum.getText()));
+                System.out.println(unit);
             }
             statusLabel.setText("System is Running");
 
@@ -243,18 +315,23 @@ public class GUI {
         panel.add(fileLocation);
         panel.add(fileButton);
         panel.add(statusLabel);
-        panel.add(queueLabel);
+        panel.add(cpuZeroQueueLabel);
+        panel.add(cpuOneQueueLabel);
         panel.add(timeUnitLabel);
         panel.add(unitLabel);
-        panel.add(enterPrompt);
+        // panel.add(enterPrompt);
+        // panel.add(enterPromptQuantum);
         panel.add(timeUnit);
+        panel.add(timeQuantumLabel);
+        panel.add(timeQuantum);
         panel.add(firstCPUDetails);
         panel.add(secondCPUDetails);
-        panel.add(throughputLabel);
+        panel.add(cpuZeroNTATLabel);
+        panel.add(cpuOneNTATLabel);
         frame.setContentPane(panel); // Sets 'panel' as the content display
         frame.getContentPane().setBackground(Color.lightGray); // Colors the background of the frame gray
         frame.pack();
-        frame.setSize(575, 600); // Sets window size to 500x600
+        frame.setSize(1190, 600); // Sets window size to 500x600
         frame.setVisible(true); // Allows everything to be visible
     }
 
