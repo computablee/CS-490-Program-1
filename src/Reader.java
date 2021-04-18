@@ -4,6 +4,7 @@ import Backend.QueueOrdering;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -30,9 +31,12 @@ public class Reader {
      * @return A completed ProcessQueue object that represents the input file
      * @throws FileNotFoundException Throws if file is not found
      */
-    public ProcessQueue getData() throws FileNotFoundException {
+    public ArrayList<ProcessQueue> getData() throws FileNotFoundException {
         //Create a ProcessQueue object with FIFO ordering (instead of priority ordering)
-        ProcessQueue processQueue = new ProcessQueue(QueueOrdering.FIFO);
+        ArrayList<ProcessQueue> processQueue = new ArrayList<>(2);
+        processQueue.set(0, new ProcessQueue(QueueOrdering.HRRN));
+        processQueue.set(1, new ProcessQueue(QueueOrdering.RR));
+
         //Open the file
         Scanner s = new Scanner(new File(this.fileName));
         //Set the delimiters for a .csv
@@ -49,7 +53,8 @@ public class Reader {
             //create a process with those data items
             Process p = new Process(at, pid, st, prty);
             //push the process to the process queue
-            processQueue.pushProcess(p);
+            processQueue.get(0).addProcess(p);
+            processQueue.get(1).addProcess(p);
         }
 
         //close the file

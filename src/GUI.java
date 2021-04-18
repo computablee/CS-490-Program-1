@@ -36,7 +36,7 @@ public class GUI {
     private String[] tableColumnNames = {"Process Name", "Service Time"};
     private String[] psTableColumnNames = {"Process Name", "Arrival Time", "Service Time", "Finish Time", "TAT", "nTAT"};
     private int unit = 100;
-    private ProcessQueue pq;
+    private ArrayList<ProcessQueue> pq;
 
     public GUI() {
         javax.swing.SwingUtilities.invokeLater(this::spawnGUI);
@@ -146,7 +146,7 @@ public class GUI {
         Timer t = new Timer(1, e -> {
             if(pq != null) {
                 // Convert the processQueue from an ArrayList into a 2d array compatible with a JTable
-                ArrayList<Process> procq = pq.getQueue();
+                /*ArrayList<Process> procq = pq.getQueue();
                 Process[] processQueueArr = procq.toArray(new Process[procq.size()]);
                 String[][] processQueue2dArr = new String[processQueueArr.length][2];
                 // Populate the 2D array
@@ -158,7 +158,7 @@ public class GUI {
                 this.waitingProcessQueue = new JTable(processQueue2dArr, tableColumnNames);
                 this.processScrollPane = new JScrollPane(waitingProcessQueue);
                 processScrollPane.setBounds(20, 160, 200, 190);
-                panel.add(processScrollPane);
+                panel.add(processScrollPane);*/
 
             }
 

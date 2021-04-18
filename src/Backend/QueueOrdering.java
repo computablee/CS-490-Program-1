@@ -6,5 +6,5 @@ package Backend;
  * @author Lane Allen
  */
 public enum QueueOrdering {
-    Priority, FIFO
+    HRRN, RR
 }

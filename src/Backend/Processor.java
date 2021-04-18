@@ -12,7 +12,7 @@ public class Processor {
     //List of all CPUs
     List<CPU> CPUs;
     //List of all process statistics
-    Queue<ProcessStatistics> processStatistics;
+    ArrayList<Queue<ProcessStatistics>> processStatistics;
 
     /**
      * Constructor that does not assign a ProcessQueue to CPUs
@@ -24,11 +24,14 @@ public class Processor {
         //create an ArrayList defining CPUs
         this.CPUs = new ArrayList<>();
 
-        this.processStatistics = new ConcurrentLinkedQueue<ProcessStatistics>();
+        //create the array of process statistics
+        this.processStatistics = new ArrayList<>(CPUs);
+        for (int i = 0; i < CPUs; i++)
+            this.processStatistics.set(i, new ConcurrentLinkedQueue<ProcessStatistics>());
 
         //instantiate each CPU
         for (int i = 0; i < CPUs; i++)
-            this.CPUs.add(new CPU(i, millisecsPerTime, this.processStatistics));
+            this.CPUs.add(new CPU(i, millisecsPerTime, this.processStatistics.get(i)));
     }
 
     /**
@@ -38,13 +41,13 @@ public class Processor {
      * @param millisecsPerTime The number of milliseconds per unit of time
      * @param processQueue The process queue to assign to each CPU
      */
-    public Processor(int CPUs, int millisecsPerTime, ProcessQueue processQueue) {
+    public Processor(int CPUs, int millisecsPerTime, ArrayList<ProcessQueue> processQueue) {
         //call other constructor first
         this(CPUs, millisecsPerTime);
 
         //then assign the process queue to each CPU
-        for (CPU cpu : this.CPUs)
-            cpu.assignQueue(processQueue);
+        for (int i = 0; i < CPUs; i++)
+            this.CPUs.get(i).assignQueue(processQueue.get(i));
     }
 
     /**

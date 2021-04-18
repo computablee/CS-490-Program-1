@@ -9,7 +9,7 @@ import java.util.*;
  */
 public class ProcessQueue {
     //queue object that represents the processes
-    private Queue<Process> processes;
+    private ArrayList<Process> processes;
     private QueueOrdering queueOrdering;
 
     /**
@@ -18,44 +18,11 @@ public class ProcessQueue {
      * @param q The queue ordering (Priority or FIFO)
      */
     public ProcessQueue(QueueOrdering q) {
-        //if priority queue
-        if (q == QueueOrdering.Priority)
-            //create a PriorityQueue object that orders according to the getPriority method of a Process object
-            this.processes = new PriorityQueue<>(8, Comparator.comparingInt(Process::getPriority));
-        //if FIFO queue
-        else if (q == QueueOrdering.FIFO)
-            //create a LinkedList object
-            this.processes = new LinkedList<>();
+        //assign process queue object
+        this.processes = new ArrayList<>();
+
         //assign for later use
         this.queueOrdering = q;
-    }
-
-    /**
-     * Push a process to the queue
-     *
-     * @param p The process to push to the queue
-     */
-    public void pushProcess(Process p) {
-        //create a critical region essentially based on "this," such that only one thread may access this object at a time
-        synchronized(this) {
-            processes.add(p);
-        }
-    }
-
-    /**
-     * Pop a process from the queue
-     *
-     * @return The process popped from the queue
-     */
-    public Process popProcess() {
-        //like the pushProcess method, we synchronize on "this" so that only one thread may access this object (pushing or popping) at a time
-        synchronized(this) {
-            //make sure we check if the queue has an object before we remove
-            if (processes.size() != 0)
-                return processes.remove();
-            else
-                return null;
-        }
     }
 
     /**
@@ -68,6 +35,14 @@ public class ProcessQueue {
         synchronized(this) {
             return processes.size() > 0;
         }
+    }
+
+    public void addProcess(Process process) {
+        this.processes.add(process);
+    }
+
+    public void removeProcessAt(int i) {
+        this.processes.remove(i);
     }
 
     /**
@@ -85,16 +60,23 @@ public class ProcessQueue {
         synchronized (this) {
             //iterate through the processes.size
             for (int i = 0; i < processes.size(); i++) {
-                //if FIFO
-                if (queueOrdering == QueueOrdering.FIFO)
-                    //copy the location `i` from the linked list into the array list
-                    retVal.add(((LinkedList<Process>)processes).get(i));
-                //if priority
-                else if (queueOrdering == QueueOrdering.Priority)
-                    ;//TODO: Implement a way to add processes to retVal from a Priority Queue
+                //copy the location `i` from the linked list into the array list
+                retVal.add(processes.get(i));
             }
         }
 
         return retVal;
+    }
+
+    public ProcessQueue deepCopy() {
+        ProcessQueue copiedQueue = new ProcessQueue(this.queueOrdering);
+
+        ArrayList<Process> processes = getQueue();
+
+        for (Process p : processes) {
+            copiedQueue.addProcess(p.deepCopy());
+        }
+
+        return copiedQueue;
     }
 }
