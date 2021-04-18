@@ -238,6 +238,7 @@ public class CPU implements Runnable {
 
                 //while there is time left in the process and time left in the round robin quantum
                 while (currProcess.timeLeft > 0 && rrTimeRemaining > 0) {
+                    this.timeLeft = currProcess.timeLeft;
                     //sleep for the designated milliseconds
                     Thread.sleep(millisecsPerTime);
                     //decrement the amount of time left in the process and the RR time quantum
