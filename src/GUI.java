@@ -210,16 +210,16 @@ public class GUI {
                 // Display CPU stats
                 if(processor.isRunning() && !processor.getIsPaused(0)) {
                     // Count down the time remaining for each running process while the processor isn't paused
-                    firstCPUDetails.setText(" CPU0 \n Exec: Running\n Time Remaining = " + processor.timeRemaining(0));
-                    secondCPUDetails.setText(" CPU1 \n Exec: Running\n Time Remaining = " + processor.timeRemaining(1));
+                    firstCPUDetails.setText(" CPU0 \n Exec: Running\n Time Remaining = " + processor.timeRemaining(0) + "\n Current Process: " + processor.getExecutingProcess(0));
+                    secondCPUDetails.setText(" CPU1 \n Exec: Running\n Time Remaining = " + processor.timeRemaining(1) + "\n Current Process: " + processor.getExecutingProcess(1));
                 } else if(processor.isRunning() && processor.getIsPaused(0)) {
                     // Display the CPUs as Idle if the processor is paused
-                    firstCPUDetails.setText(" CPU0 \n Exec: Idle\n Time Remaining = " + processor.timeRemaining(0));
-                    secondCPUDetails.setText(" CPU1 \n Exec: Idle\n Time Remaining = " + processor.timeRemaining(1));
+                    firstCPUDetails.setText(" CPU0 \n Exec: Idle\n Time Remaining = " + processor.timeRemaining(0) + "\n Current Process: " + processor.getExecutingProcess(0));
+                    secondCPUDetails.setText(" CPU1 \n Exec: Idle\n Time Remaining = " + processor.timeRemaining(1) + "\n Current Process: " + processor.getExecutingProcess(1));
                 } else {
                     // Default display when the process is paused and there is no current running process
-                    firstCPUDetails.setText(" CPU0 \n Exec: Idle\n Time Remaining = n/a");
-                    secondCPUDetails.setText(" CPU1 \n Exec: Idle\n Time Remaining = n/a");
+                    firstCPUDetails.setText(" CPU0 \n Exec: Idle\n Time Remaining = n/a \n Current Process: n/a");
+                    secondCPUDetails.setText(" CPU1 \n Exec: Idle\n Time Remaining = n/a \n Current Process: n/a");
                     statusLabel.setText("System is Idle");
                 }
 
