@@ -56,7 +56,7 @@ public class CPU implements Runnable {
         this.processStatistics = processStatistics;
         this.currentTime = 0;
         this.currentRRElem = -1;
-        this.rrTimeQuantum = 2;
+        this.rrTimeQuantum = 1;
         this.rrTimeRemaining = this.rrTimeQuantum;
     }
 
@@ -67,6 +67,14 @@ public class CPU implements Runnable {
      */
     public void assignQueue(ProcessQueue pq) {
         this.queue = pq;
+    }
+
+    private int inQueueProcesses() {
+        int total = 0;
+        for (int i = 0; i < queue.count(); i++)
+            if (queue.get(i).getArrivalTime() <= currentTime)
+                total++;
+        return total;
     }
 
     /**
@@ -88,9 +96,9 @@ public class CPU implements Runnable {
             for (int i = 0; i < queue.count(); i++) {
                 Process p = queue.get(i);
                 //if the process hasn't arrived yet, set its response ratio to -1
-                if (p.getArrivalTime() < currentTime)
+                if (p.getArrivalTime() > currentTime)
                     responseRatio.add(-1.0);
-                //else calculate its response ratio
+                    //else calculate its response ratio
                 else
                     responseRatio.add(((double) currentTime - (double) p.getArrivalTime() + (double) p.getServiceTime()) / (double) p.getServiceTime());
             }
@@ -125,34 +133,29 @@ public class CPU implements Runnable {
         }
         //if round robin
         else if (queue.getQueueOrdering() == QueueOrdering.RR) {
-            //if the current element has no time left, remove it from the system
-            if (currentRRElem >= 0 && queue.get(currentRRElem).timeLeft <= 0) {
-                //remove the current process
+            if (currentRRElem >= 0 && queue.get(currentRRElem).timeLeft == 0) {
                 queue.removeProcessAt(currentRRElem);
-
-                //SPAGHETTI CODE ALERT AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-                //this basically makes sure we select a new element in a round robin fashion that is currently in the system
-                //there is a variant of this on line 148, but this one is specific to the case that we didn't have to remove an element
-                int init = currentRRElem;
-                while (queue.get(currentRRElem).getArrivalTime() >= currentTime){
-                    currentRRElem++;
-                    currentRRElem %= queue.count();
-                    //if this is true, no processes are actually in the system currently
-                    if (init == currentRRElem)
-                        return null;
-                }
+                currentRRElem--;
             }
-            else {
-                //MORE SPAGHETTI CODE ALERT AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-                //this basically makes sure we select a new element in a round robin fashion that is currently in the system
-                int init = currentRRElem;
-                do {
-                    currentRRElem++;
-                    currentRRElem %= queue.count();
-                    //if this is true, no processes are actually in the system currently
-                    if (init == currentRRElem)
-                        return null;
-                } while (queue.get(currentRRElem).getArrivalTime() >= currentTime);
+
+            if (queue.count() == 0)
+                return null;
+
+            int initElem = currentRRElem + 1 & queue.count();
+            currentRRElem++;
+            currentRRElem %= inQueueProcesses();
+
+            while (queue.get(currentRRElem).getArrivalTime() > currentTime) {
+                currentRRElem++;
+                currentRRElem %= inQueueProcesses();
+                if (currentRRElem == initElem) {
+                    //sleep for the designated milliseconds
+                    Thread.sleep(millisecsPerTime);
+                    //increment current time
+                    currentTime++;
+                    //try again
+                    return null;
+                }
             }
 
             //if the queue is empty, return null
