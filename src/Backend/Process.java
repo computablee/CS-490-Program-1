@@ -15,7 +15,7 @@ public class Process {
     //priority
     private int priority;
     //time left
-    public int timeLeft;
+    private int timeLeft;
 
     /**
      * Constructor
@@ -67,5 +67,13 @@ public class Process {
         Process copiedProcess = new Process(this.arrivalTime, this.processID, this.serviceTime, this.priority);
 
         return copiedProcess;
+    }
+
+    public void decrementTimeLeft() {
+        this.timeLeft--;
+    }
+
+    public int getTimeLeft() {
+        return timeLeft;
     }
 }

@@ -159,7 +159,7 @@ public class CPU implements Runnable {
         }
         //if round robin
         else if (queue.getQueueOrdering() == QueueOrdering.RR) {
-            if (currentRRElem >= 0 && queue.get(currentRRElem).timeLeft == 0) {
+            if (currentRRElem >= 0 && queue.get(currentRRElem).getTimeLeft() == 0) {
                 //current process statistics
                 ProcessStatistics currProcessStatistics = new ProcessStatistics(currProcess);
                 //set some process statistics
@@ -234,15 +234,15 @@ public class CPU implements Runnable {
                     continue;
 
                 //output the currently executing process to the console
-                System.out.println("CPU" + CPUNum.toString() + " now executing \"" + currProcess.getProcessID() + "\" for " + millisecsPerTime * currProcess.timeLeft + " milliseconds.");
+                System.out.println("CPU" + CPUNum.toString() + " now executing \"" + currProcess.getProcessID() + "\" for " + millisecsPerTime * currProcess.getTimeLeft() + " milliseconds.");
 
                 //while there is time left in the process and time left in the round robin quantum
-                while (currProcess.timeLeft > 0 && rrTimeRemaining > 0) {
-                    this.timeLeft = currProcess.timeLeft;
+                while (currProcess.getTimeLeft() > 0 && rrTimeRemaining > 0) {
+                    this.timeLeft = currProcess.getTimeLeft();
                     //sleep for the designated milliseconds
                     Thread.sleep(millisecsPerTime);
                     //decrement the amount of time left in the process and the RR time quantum
-                    currProcess.timeLeft--;
+                    currProcess.decrementTimeLeft();
                     //if the queue is set to RR, decrement the time remaining in the quantum
                     if (queue.getQueueOrdering() == QueueOrdering.RR)
                         rrTimeRemaining--;
