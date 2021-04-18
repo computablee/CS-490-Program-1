@@ -89,6 +89,15 @@ public class CPU implements Runnable {
 
         //if HRRN
         if (queue.getQueueOrdering() == QueueOrdering.HRRN) {
+            //current process statistics
+            ProcessStatistics currProcessStatistics = new ProcessStatistics(currProcess);
+            //set some process statistics
+            currProcessStatistics.setFinishTime(currentTime);
+            currProcessStatistics.setTat(currentTime - currProcess.getArrivalTime());
+            currProcessStatistics.setNtat((float)currProcessStatistics.getTat() / (float)currProcess.getServiceTime());
+
+            processStatistics.add(currProcessStatistics);
+
             //Create an array of response ratios
             ArrayList<Double> responseRatio = new ArrayList<>();
 
@@ -134,6 +143,15 @@ public class CPU implements Runnable {
         //if round robin
         else if (queue.getQueueOrdering() == QueueOrdering.RR) {
             if (currentRRElem >= 0 && queue.get(currentRRElem).timeLeft == 0) {
+                //current process statistics
+                ProcessStatistics currProcessStatistics = new ProcessStatistics(currProcess);
+                //set some process statistics
+                currProcessStatistics.setFinishTime(currentTime);
+                currProcessStatistics.setTat(currentTime - currProcess.getArrivalTime());
+                currProcessStatistics.setNtat((float)currProcessStatistics.getTat() / (float)currProcess.getServiceTime());
+
+                processStatistics.add(currProcessStatistics);
+
                 queue.removeProcessAt(currentRRElem);
                 currentRRElem--;
             }
@@ -198,9 +216,6 @@ public class CPU implements Runnable {
                 if (currProcess == null)
                     continue;
 
-                //current process statistics
-                ProcessStatistics currProcessStatistics = new ProcessStatistics(currProcess);
-
                 //output the currently executing process to the console
                 System.out.println("CPU" + CPUNum.toString() + " now executing \"" + currProcess.getProcessID() + "\" for " + millisecsPerTime * currProcess.timeLeft + " milliseconds.");
 
@@ -216,13 +231,6 @@ public class CPU implements Runnable {
                     //increment the current time
                     currentTime++;
                 }
-
-                //set some process statistics
-                currProcessStatistics.setFinishTime(currentTime);
-                currProcessStatistics.setTat(currentTime - currProcess.getArrivalTime());
-                currProcessStatistics.setNtat((float)currProcessStatistics.getTat() / (float)currProcess.getServiceTime());
-
-                processStatistics.add(currProcessStatistics);
             } catch (InterruptedException e) {
                 //if we were interrupted, simply terminate the thread
                 return;
